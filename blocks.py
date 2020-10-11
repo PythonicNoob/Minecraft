@@ -2,6 +2,9 @@ from pyglet import image
 from pyglet.gl import *
 from pyglet.graphics import TextureGroup
 
+def sample():
+    print("Sample Pressed")
+    return "sample_action"
 
 class Block():
 
@@ -73,6 +76,7 @@ class Block():
         self.id = id
         self.transparent = transparent
         self.type = type
+        self.right_click = right_click
 
 
     def get_id(self):
@@ -101,7 +105,7 @@ class Block():
         return self.type
 
 
-stone = Block(1, ['textures/block/stone.png'] * 6, 'block')
+stone = Block(1, ['textures/block/stone.png'] * 6, 'block', right_click=sample)
 sand = Block(2, ['textures/block/sand.png'] * 6, 'block')
 brick = Block(3, ['textures/block/bricks.png'] * 6, 'block')
 bedrock = Block(4, ['textures/block/bedrock.png'] * 6, 'block')

@@ -769,7 +769,11 @@ class Window(pyglet.window.Window):
                 # ON OSX, control + left click = right click.
                 if previous:
                     # print("right click block:",self.block)
-                    self.model.add_block_new(previous, self.block)
+                    right_click_action = self.model.shown[block].right_click_press()
+                    if right_click_action is not None:
+                        print("Performing action: ", right_click_action)
+                    else:
+                        self.model.add_block_new(previous, self.block)
             elif button == pyglet.window.mouse.LEFT and block:
                 texture = self.model.world[block]
                 if texture != bedrock: #TODO: Over here make sure STONE is changed to stone if new system works!
