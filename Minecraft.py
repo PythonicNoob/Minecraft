@@ -13,7 +13,7 @@ from pyglet.gl import *
 from pyglet.graphics import TextureGroup
 from pyglet.window import key, mouse
 
-from blocks import grass, sand, stone, bedrock, brick
+from blocks import grass, sand, stone, bedrock, brick, acacia_leaves, acacia_sapling
 
 TICKS_PER_SEC = 60
 
@@ -88,6 +88,10 @@ def tex_coords(top, bottom, side):
     result.extend(side * 4)
     return result
 
+def grass_verts(pos,n=0.5):
+    x,y,z = pos; v = tuple((x+X,y+Y,z+Z) for X in (-n,n) for Y in (-n,n) for Z in (-n,n))
+    return tuple(tuple(k for j in i for k in v[j]) for i in ((0,5,7,2),(1,4,6,3)))
+
 
 TEXTURE_PATH = 'texture.png'
 
@@ -97,12 +101,12 @@ BRICK = tex_coords((2, 0), (2, 0), (2, 0))
 STONE = tex_coords((2, 1), (2, 1), (2, 1))
 
 FACES = [
-    ( 0, 1, 0),
-    ( 0,-1, 0),
-    (-1, 0, 0),
-    ( 1, 0, 0),
-    ( 0, 0, 1),
-    ( 0, 0,-1),
+    ( 0, 1, 0), # TOP
+    ( 0,-1, 0), # BOTTOM
+    (-1, 0, 0), # LEFT
+    ( 1, 0, 0), # RIGHT
+    ( 0, 0, 1), # FRONT
+    ( 0, 0,-1), # BACK
 ]
 
 
@@ -141,6 +145,7 @@ class Model(object):
 
         # A Batch is a collection of vertex lists for batched rendering.
         self.batch = pyglet.graphics.Batch()
+
 
         # A TextureGroup manages an OpenGL texture.
         self.group = TextureGroup(image.load(TEXTURE_PATH).get_texture())
@@ -234,6 +239,9 @@ class Model(object):
         for dx, dy, dz in FACES:
             if (x + dx, y + dy, z + dz) not in self.world:
                 return True
+            else:
+                if self.world[x + dx, y + dy, z + dz].transparent:
+                    return True
         return False
 
     def add_block(self, position, texture, immediate=True):
@@ -309,7 +317,7 @@ class Model(object):
                 if key not in self.shown:
                     self.show_block_new(key)
             else:
-                if key in self.shown:
+                if key in self.shown: # TODO: Use seperate faces so that instead of rendering full block, only exposed sides are rendered
                     self.hide_block(key)
 
     def show_block(self, position, immediate=True):
@@ -347,6 +355,42 @@ class Model(object):
         else:
             self._enqueue(self._show_block_new, position, block)
 
+    def _show_block_plant(self, position, texture):
+        v = grass_verts(position)
+        vl = []
+
+        for i in v:
+            vl += [self.batch.add(4, GL_QUADS, texture, ('v3f', i), ('t2f', (0, 0, 1, 0, 1, 1, 0, 1)))]
+        self._shown[position] = vl
+
+    def _show_block_block(self, position, block_tex):
+
+        x, y, z = position
+        vertex_data = cube_vertices_with_sides(x, y, z, 0.5)
+        texture_data = (0, 0, 1, 0, 1, 1, 0, 1)
+
+        self._shown[position] = [self.batch.add(4, GL_QUADS, block_tex[0],
+                                                ('v3f/static', vertex_data[0]),
+                                                ('t2f/static', texture_data)),  # top
+
+                                 self.batch.add(4, GL_QUADS, block_tex[2],
+                                                ('v3f/static', vertex_data[2]),
+                                                ('t2f/static', texture_data)),  # left
+
+                                 self.batch.add(4, GL_QUADS, block_tex[3],
+                                                ('v3f/static', vertex_data[3]),
+                                                ('t2f/static', texture_data)),  # right
+
+                                 self.batch.add(4, GL_QUADS, block_tex[4],
+                                                ('v3f/static', vertex_data[4]),
+                                                ('t2f/static', texture_data)),  # front
+                                 self.batch.add(4, GL_QUADS, block_tex[5],
+                                                ('v3f/static', vertex_data[5]),
+                                                ('t2f/static', texture_data)),  # back
+
+                                 self.batch.add(4, GL_QUADS, block_tex[1],
+                                                ('v3f/static', vertex_data[1]),
+                                                ('t2f/static', texture_data))]  # bottom
 
     def _show_block_new(self, position, block):
         """ Private implementation of the `show_block()` method.
@@ -358,37 +402,20 @@ class Model(object):
             The coordinates of the texture squares. Use `tex_coords()` to
             generate.
         """
-        x, y, z = position
-        vertex_data = cube_vertices_with_sides(x, y, z, 0.5)
-        texture_data = (0,0, 1,0, 1,1, 0,1)
+        # x, y, z = position
+        # vertex_data = cube_vertices_with_sides(x, y, z, 0.5)
+        # texture_data = (0,0, 1,0, 1,1, 0,1)
         # texture_data = list(texture)
         # create vertex list
         # FIXME Maybe `add_indexed()` should be used instead
         block_tex = block.get_textures()
         block_col = block.get_colors()
+        block_type = block.get_type()
 
-        self._shown[position] = [self.batch.add(4, GL_QUADS, block_tex[0],
-            ('v3f/static', vertex_data[0]),
-            ('t2f/static', texture_data)),  #top
-
-        self.batch.add(4, GL_QUADS, block_tex[1],
-                                               ('v3f/static', vertex_data[1]),
-                                               ('t2f/static', texture_data) ), # bottom
-
-        self.batch.add(4, GL_QUADS, block_tex[2],
-                                               ('v3f/static', vertex_data[2]),
-                                               ('t2f/static', texture_data)), # left
-
-        self.batch.add(4, GL_QUADS, block_tex[3],
-                                               ('v3f/static', vertex_data[3]),
-                                               ('t2f/static', texture_data)), # right
-
-        self.batch.add(4, GL_QUADS, block_tex[4],
-                                               ('v3f/static', vertex_data[4]),
-                                               ('t2f/static', texture_data)), # front
-        self.batch.add(4, GL_QUADS, block_tex[5],
-                                               ('v3f/static', vertex_data[5]),
-                                               ('t2f/static', texture_data))] # back
+        if block_type == 'block':
+            self._show_block_block(position, block_tex)
+        elif block_type == 'plant':
+            self._show_block_plant(position, block_tex[0])
 
 
     def _show_block(self, position, texture):
@@ -490,8 +517,8 @@ class Model(object):
         _show_block() and _hide_block() so this method should be called if
         add_block() or remove_block() was called with immediate=False
         """
-        start = time.clock()
-        while self.queue and time.clock() - start < 1.0 / TICKS_PER_SEC:
+        start = time.perf_counter() # TODO: .clock() vs process_time() vs perf_counter()
+        while self.queue and time.perf_counter() - start < 1.0 / TICKS_PER_SEC:
             self._dequeue()
 
     def process_entire_queue(self):
@@ -538,12 +565,15 @@ class Window(pyglet.window.Window):
         # The crosshairs at the center of the screen.
         self.reticle = None
 
+        # hotbar
+        self.hotbar = None
+
         # Velocity in the y (upward) direction.
         self.dy = -10
 
         # A list of blocks the player can place. Hit num keys to cycle.
         # self.inventory = [BRICK, GRASS, SAND]
-        self.inventory = [brick, grass, sand, stone]
+        self.inventory = [brick, grass, sand, stone, acacia_leaves, acacia_sapling]
 
         # The current block the user can place. Hit num keys to cycle.
         self.block = self.inventory[0]
@@ -738,12 +768,12 @@ class Window(pyglet.window.Window):
                     ((button == mouse.LEFT) and (modifiers & key.MOD_CTRL)):
                 # ON OSX, control + left click = right click.
                 if previous:
-                    print("right click block:",self.block)
+                    # print("right click block:",self.block)
                     self.model.add_block_new(previous, self.block)
             elif button == pyglet.window.mouse.LEFT and block:
                 texture = self.model.world[block]
                 if texture != bedrock: #TODO: Over here make sure STONE is changed to stone if new system works!
-                    print("left click block:", block)
+                    # print("left click block:", block)
                     self.model.remove_block(block)
 
         else:
@@ -822,6 +852,11 @@ class Window(pyglet.window.Window):
         # reticle
         if self.reticle:
             self.reticle.delete()
+
+        if self.hotbar:
+            self.hotbar.update(x=self.width // 2, scale_x=(self.width * 0.4) // self.hotbar.width,
+                               scale_y=(self.height * 0.04) // self.hotbar.height)
+
         x, y = self.width // 2, self.height // 2
         n = 10
         self.reticle = pyglet.graphics.vertex_list(4,
@@ -847,6 +882,15 @@ class Window(pyglet.window.Window):
         """
         width, height = self.get_size()
         glEnable(GL_DEPTH_TEST)
+
+        # Extra for transparency from minecraft 4 from dlc.energy
+        # -------
+        glDepthFunc(GL_LEQUAL)
+        glAlphaFunc(GL_EQUAL, 1)
+        glEnable(GL_BLEND)
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
+        # --------
+
         viewport = self.get_viewport_size()
         glViewport(0, 0, max(1, viewport[0]), max(1, viewport[1]))
         glMatrixMode(GL_PROJECTION)
@@ -867,11 +911,15 @@ class Window(pyglet.window.Window):
         self.clear()
         self.set_3d()
         glColor3d(1, 1, 1)
+        # Extra
+        glEnable(GL_ALPHA_TEST)
         self.model.batch.draw()
+        glDisable (GL_ALPHA_TEST)
         self.draw_focused_block()
         self.set_2d()
         self.draw_label()
         self.draw_reticle()
+        self.draw_inventory()
 
     def draw_focused_block(self):
         """ Draw black edges around the block that is currently under the
@@ -901,6 +949,15 @@ class Window(pyglet.window.Window):
         """
         glColor3d(0, 0, 0)
         self.reticle.draw(GL_LINES)
+
+    def draw_inventory(self):
+        hotbar_image = pyglet.image.load('hotbar.png')
+        hotbar_image.anchor_x = hotbar_image.width // 2
+        # hotbar_image.anchor_y = hotbar_image.height
+        self.hotbar = pyglet.sprite.Sprite(hotbar_image, x=self.width // 2, y=0)
+        self.hotbar.update(scale_x=(self.width * 0.6) // self.hotbar.width,
+                           scale_y=(self.height * 0.06) // self.hotbar.height)  # *0% width and 10% height
+        self.hotbar.draw()
 
 
 def setup_fog():
@@ -934,6 +991,9 @@ def setup():
     # "is generally faster than GL_LINEAR, but it can produce textured images
     # with sharper edges because the transition between texture elements is not
     # as smooth."
+
+    # glDisable(GL_LIGHTING)
+
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST)
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST)
     setup_fog()

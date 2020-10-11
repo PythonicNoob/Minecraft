@@ -5,36 +5,53 @@ from pyglet.graphics import TextureGroup
 
 class Block():
 
-    def __init__(self, id, filepath, colors=None, rigid=True):
-        self.texture_top = TextureGroup(image.load(filepath[0]).get_texture())
+    def load_tex(self, filepath, transparent):
+        if not transparent:
+            tex = TextureGroup(image.load(filepath).get_mipmapped_texture())
+            glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST_MIPMAP_LINEAR)
+        else:
+            tex = TextureGroup(image.load(filepath).get_texture())
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST)
+        return tex
 
-        glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST)
-        glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST)
+    def __init__(self, id, filepath, type,colors=None, rigid=True, transparent=False, right_click=None):
 
-        self.texture_bottom = TextureGroup(image.load(filepath[1]).get_texture())
+        self.texture_top = self.load_tex(filepath[0], transparent)
+        self.texture_bottom = self.load_tex(filepath[1], transparent)
+        self.texture_left = self.load_tex(filepath[2], transparent)
+        self.texture_right = self.load_tex(filepath[3], transparent)
+        self.texture_front = self.load_tex(filepath[4], transparent)
+        self.texture_back = self.load_tex(filepath[5], transparent)
 
-        glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST)
-        glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST)
-
-        self.texture_left = TextureGroup(image.load(filepath[2]).get_texture())
-
-        glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST)
-        glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST)
-
-        self.texture_right = TextureGroup(image.load(filepath[3]).get_texture())
-
-        glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST)
-        glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST)
-
-        self.texture_front = TextureGroup(image.load(filepath[4]).get_texture())
-
-        glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST)
-        glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST)
-
-        self.texture_back = TextureGroup(image.load(filepath[5]).get_texture())
-
-        glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST)
-        glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST)
+        # self.texture_top = TextureGroup(image.load(filepath[0]).get_texture())
+        #
+        # glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST)
+        # glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST)
+        #
+        # self.texture_bottom = TextureGroup(image.load(filepath[1]).get_texture())
+        #
+        # glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST)
+        # glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST)
+        #
+        # self.texture_left = TextureGroup(image.load(filepath[2]).get_texture())
+        #
+        # glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST)
+        # glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST)
+        #
+        # self.texture_right = TextureGroup(image.load(filepath[3]).get_texture())
+        #
+        # glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST)
+        # glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST)
+        #
+        # self.texture_front = TextureGroup(image.load(filepath[4]).get_texture())
+        #
+        # glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST)
+        # glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST)
+        #
+        # self.texture_back = TextureGroup(image.load(filepath[5]).get_texture())
+        #
+        # glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST)
+        # glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST)
 
         if colors is not None:
             self.color_top = colors[0]
@@ -54,6 +71,9 @@ class Block():
         self.files = filepath
         self.collision = rigid
         self.id = id
+        self.transparent = transparent
+        self.type = type
+
 
     def get_id(self):
         return self.id
@@ -71,11 +91,22 @@ class Block():
     def update(self):
         pass
 
+    def right_click_press(self):
+        if self.right_click is None:
+            return None
+        else:
+            return self.right_click()
 
-stone = Block(1, ['textures/block/stone.png'] * 6)
-sand = Block(2, ['textures/block/sand.png'] * 6)
-brick = Block(3, ['textures/block/bricks.png'] * 6)
-bedrock = Block(4, ['textures/block/bedrock.png'] * 6)
+    def get_type(self):
+        return self.type
+
+
+stone = Block(1, ['textures/block/stone.png'] * 6, 'block')
+sand = Block(2, ['textures/block/sand.png'] * 6, 'block')
+brick = Block(3, ['textures/block/bricks.png'] * 6, 'block')
+bedrock = Block(4, ['textures/block/bedrock.png'] * 6, 'block')
+acacia_leaves = Block(5, ['textures/block/acacia_leaves.png']*6, 'block', transparent=True)
+acacia_sapling = Block(6, ['textures/block/acacia_sapling.png']*6, 'plant', transparent=True)
 
 grass_top_color = (0, 153, 0, 0,  # Point 1
                    0, 153, 0, 0,  # Point 2
@@ -83,5 +114,5 @@ grass_top_color = (0, 153, 0, 0,  # Point 1
                    0, 153, 0, 0)  # Point 4
 
 grass = Block(4,
-              ['textures/block/grass_top.png', 'textures/block/dirt.png'] + ['textures/block/grass_block_side.png'] * 4,
+              ['textures/block/grass_top.png', 'textures/block/dirt.png'] + ['textures/block/grass_block_side.png'] * 4, 'block',
               colors=[grass_top_color, None, None, None, None, None])
