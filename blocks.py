@@ -1,60 +1,104 @@
 from pyglet import image
 from pyglet.gl import *
 from pyglet.graphics import TextureGroup
+import pyglet
+# import numpy as np
+
+__all__ = (
+    'stone_block', 'sand_block', 'brick_block', 'bedrock_block', 'acacia_leaves_block', 'acacia_sapling_block','blue_concrete_powder_block', 'grass_block', 'water_block', 'dirt_block', 'snow_block', 'diamondore_block', 'coalore_block', 'gravel_block','ironore_block','lapisore_block', 'quartz_block','clay_block','nether_block','nether_quartz_ore_block' ,'soulsand_block', 'sandstone_block', 'ice_block', 'snowgrass_block', 'air_block')
+
+def grass_on_place(pos, model):
+    x, y, z = pos
+    if model.world.get((x, y+1, z), None):
+        model.remove_block(pos, immediate=True)
+        model.add_block_new(pos, dirt_block, immediate=True)
+
+
+class PlantGroup(TextureGroup):
+
+    def __init__(self, texture, parent=None):
+        super(PlantGroup, self).__init__(texture, parent)
+
+    def set_state(self):
+        TextureGroup.set_state(self)
+        glDisable(GL_CULL_FACE)
+
+    def unset_state(self):
+        TextureGroup.unset_state(self)
+        glEnable(GL_CULL_FACE)
+
+
+class BiomeGroup(TextureGroup):
+
+    def __init__(self, texture, color, parent=None):
+        super(BiomeGroup, self).__init__(texture, parent)
+        self.color = color
+
+    def set_state(self):
+        # print("BiomeGroup being rendered  yay!")
+        TextureGroup.set_state(self)
+        # glEnable(GL_COLOR_MATERIAL)
+        # glColorMaterial(GL_FRONT, GL_DIFFUSE)
+        # glColorMaterial(GL_FRONT, GL_SPECULAR)
+        glColor4f(*self.color)
+        # glColor4f(71/255, 205/255, 51/255, 1)
+        # glEnable(GL_CULL_FACE)
+
+    def unset_state(self):
+        TextureGroup.unset_state(self)
+        glColor4f(1, 1, 1, 1)
+        # glDisable(GL_COLOR_MATERIAL)
+        # glDisable(GL_CULL_FACE)
+
 
 def sample():
     print("Sample Pressed")
     return "sample_action"
 
+def grass_verts(pos,n=0.5):
+    x,y,z = pos; v = tuple((x+X,y+Y,z+Z) for X in (-n,n) for Y in (-n,n) for Z in (-n,n))
+    return tuple(tuple(k for j in i for k in v[j]) for i in ((0,5,7,2),(1,4,6,3)))
+
+def cube_vertices_with_sides(x, y, z, n=0.5):
+    """ Return the vertices of the cube at position x, y, z with size 2*n.
+    """
+    return [
+        [x-n,y+n,z-n, x-n,y+n,z+n, x+n,y+n,z+n, x+n,y+n,z-n],  # top
+        [x-n,y-n,z-n, x+n,y-n,z-n, x+n,y-n,z+n, x-n,y-n,z+n],  # bottom
+        [x-n,y-n,z-n, x-n,y-n,z+n, x-n,y+n,z+n, x-n,y+n,z-n],  # left
+        [x+n,y-n,z+n, x+n,y-n,z-n, x+n,y+n,z-n, x+n,y+n,z+n],  # right
+        [x-n,y-n,z+n, x+n,y-n,z+n, x+n,y+n,z+n, x-n,y+n,z+n],  # front
+        [x+n,y-n,z-n, x-n,y-n,z-n, x-n,y+n,z-n, x+n,y+n,z-n],  # back
+    ]
+
 class Block():
 
-    def load_tex(self, filepath, transparent):
+    def load_tex(self, filepath, color, transparent):
+
+        GroupClass = TextureGroup
+        if color:
+            # print("using color")
+            GroupClass = lambda x: BiomeGroup(x, color)
+
         if not transparent:
-            tex = TextureGroup(image.load(filepath).get_mipmapped_texture())
+            tex = GroupClass(image.load(filepath).get_mipmapped_texture())
             glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST_MIPMAP_LINEAR)
         else:
-            tex = TextureGroup(image.load(filepath).get_texture())
+            tex = GroupClass(image.load(filepath).get_texture())
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST)
         return tex
 
-    def __init__(self, id, filepath, type,colors=None, rigid=True, transparent=False, right_click=None):
 
-        self.texture_top = self.load_tex(filepath[0], transparent)
-        self.texture_bottom = self.load_tex(filepath[1], transparent)
-        self.texture_left = self.load_tex(filepath[2], transparent)
-        self.texture_right = self.load_tex(filepath[3], transparent)
-        self.texture_front = self.load_tex(filepath[4], transparent)
-        self.texture_back = self.load_tex(filepath[5], transparent)
-
-        # self.texture_top = TextureGroup(image.load(filepath[0]).get_texture())
-        #
-        # glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST)
-        # glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST)
-        #
-        # self.texture_bottom = TextureGroup(image.load(filepath[1]).get_texture())
-        #
-        # glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST)
-        # glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST)
-        #
-        # self.texture_left = TextureGroup(image.load(filepath[2]).get_texture())
-        #
-        # glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST)
-        # glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST)
-        #
-        # self.texture_right = TextureGroup(image.load(filepath[3]).get_texture())
-        #
-        # glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST)
-        # glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST)
-        #
+    def __init__(self, id, filepath, colors=None, rigid=True, transparent=False, right_click=None, place_function=None):
         # self.texture_front = TextureGroup(image.load(filepath[4]).get_texture())
-        #
-        # glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST)
-        # glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST)
-        #
-        # self.texture_back = TextureGroup(image.load(filepath[5]).get_texture())
-        #
-        # glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST)
-        # glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST)
+
+        self.texture_top = self.load_tex(filepath[0], None if colors is None else colors[0], transparent, )
+        self.texture_bottom = self.load_tex(filepath[1], None if colors is None else colors[1], transparent)
+        self.texture_left = self.load_tex(filepath[2], None if colors is None else colors[2], transparent)
+        self.texture_right = self.load_tex(filepath[3], None if colors is None else colors[3], transparent)
+        self.texture_front = self.load_tex(filepath[4], None if colors is None else colors[4], transparent)
+        self.texture_back = self.load_tex(filepath[5], None if colors is None else colors[5], transparent)
+
 
         if colors is not None:
             self.color_top = colors[0]
@@ -77,7 +121,7 @@ class Block():
         self.transparent = transparent
         self.type = type
         self.right_click = right_click
-
+        self.place_function = place_function
 
     def get_id(self):
         return self.id
@@ -85,6 +129,9 @@ class Block():
     def get_textures(self):
         return [self.texture_top, self.texture_bottom, self.texture_left, self.texture_right, self.texture_front,
                 self.texture_back]  # format: top, bottom, left, right, front, back
+
+    def get_colors(self):
+        return [self.color_top, self.color_bottom, self.color_left, self.color_right, self.color_front, self.color_back]
 
     def get_collision(self):
         return self.collision
@@ -104,19 +151,193 @@ class Block():
     def get_type(self):
         return self.type
 
+    def on_place(self, pos, model):
+        if self.place_function:
+            self.place_function(pos, model)
 
-stone = Block(1, ['textures/block/stone.png'] * 6, 'block', right_click=sample)
-sand = Block(2, ['textures/block/sand.png'] * 6, 'block')
-brick = Block(3, ['textures/block/bricks.png'] * 6, 'block')
-bedrock = Block(4, ['textures/block/bedrock.png'] * 6, 'block')
-acacia_leaves = Block(5, ['textures/block/acacia_leaves.png']*6, 'block', transparent=True)
-acacia_sapling = Block(6, ['textures/block/acacia_sapling.png']*6, 'plant', transparent=True)
+    def show(self, pos, batch):
 
-grass_top_color = (0, 153, 0, 0,  # Point 1
-                   0, 153, 0, 0,  # Point 2
-                   0, 153, 0, 0,  # Point 2
-                   0, 153, 0, 0)  # Point 4
+        block_tex = self.get_textures()
+        block_cols = self.get_colors()
+        # print("block cols:", block_cols)
+        texture_data = (0, 0, 1, 0, 1, 1, 0, 1)
+        vertex_data = cube_vertices_with_sides(*pos)
+        shown = []
 
-grass = Block(4,
-              ['textures/block/grass_top.png', 'textures/block/dirt.png'] + ['textures/block/grass_block_side.png'] * 4, 'block',
-              colors=[grass_top_color, None, None, None, None, None])
+
+
+        for sde in range(0,6): #sde meaning side. Add each side
+
+            shown += [batch.add(4, GL_QUADS, block_tex[sde], ('v3f/static', vertex_data[sde]),
+                                ('t2f/static', texture_data))]
+
+            # if block_cols[sde]:
+            #     # glEnable(GL_COLOR_MATERIAL)
+            #     # glColorMaterial(GL_FRONT, GL_DIFFUSE)
+            #     # glColorMaterial(GL_FRONT, GL_SPECULAR)
+            #     # glColor4f(0.2,0.3,0.1,1)
+            #
+            #     batch = pyglet.graphics.Batch()
+            #     batch.add(4, GL_QUADS, block_tex[sde], ('v3f/static', vertex_data[sde]),
+            #                         ('t2f/static', texture_data))
+            #     batch.draw()
+            #     # pyglet.graphics.draw(4, GL_QUADS, block_tex[sde], ('v3f/static', vertex_data[sde]),
+            #     #                     ('t2f/static', texture_data))
+            #
+            #     # shown += [batch.add(4, GL_QUADS, block_tex[sde], ('v3f/static', vertex_data[sde]),
+            #     #                     ('t2f/static', texture_data))]
+            #     # glColor4f(1,1,1,1)
+            #     # glDisable(GL_COLOR_MATERIAL)
+            # else:
+            #     shown += [batch.add(4, GL_QUADS, block_tex[sde], ('v3f/static', vertex_data[sde]),
+            #                         ('t2f/static', texture_data))]
+            #     # print("block cols[sde]",block_cols[sde])
+            #
+            #     # shown += [batch.add(4, GL_QUADS, None, ('v3f/static', vertex_data[sde]), ('c3f', block_cols[sde])  )]
+
+        return shown
+
+    def hide(self, vertex_data):
+        [x.delete() for x in vertex_data]
+
+class TimeLoop:
+    def __init__(self,duration): self.unit = 0; self.int = 0; self.duration = duration; self.prev = 0
+    def update(self,dt):
+        self.unit+=dt; self.unit-=int(self.unit); self.int = int(self.unit*self.duration)
+        if self.prev!=self.int: self.prev = self.int; return True
+
+
+
+class Liquid(Block): #TODO: proper implementation of breaking and adding water.
+                    # TODO: add a blue cover over screen if player is in water
+    def __init__(self, id, filepath,  ):
+        super(Liquid, self).__init__(id,filepath, transparent=True, rigid=False)
+        # self.transparent = transparent
+        self.needs_transparent_batch = True
+        self.time = {'still':TimeLoop(32),'flow':TimeLoop(32)}
+        self.coords = {'still':[],'flow':[]}; self.still_faces = {}; self.flow_faces = {}
+        for i in range(32-1,-1,-1):
+            y0 = i/16; y1 = (i+1)/16; self.coords['still'] += [[0,y0, 1,y0, 1,y1, 0,y1]]
+            y0 = i/32; y1 = (i+1)/32; self.coords['flow'] += [[0,y0, 1,y0, 1,y1, 0,y1]]
+        a,b = self.time['still'],self.time['flow']; self.t = b,b,a,a,b,b
+        a,b = self.coords['still'],self.coords['flow']; self.c = b,b,a,a,b,b
+
+
+    # def set_transparent(self, transparent_batch):
+    #     self.transparent_batch = transparent_batch
+
+    def update(self,dt):
+        if self.time['still'].update(dt*0.5):
+            for face,i in self.still_faces.items(): face.tex_coords = self.c[i][self.t[i].int]
+        if self.time['flow'].update(dt):
+            for face,i in self.flow_faces.items(): face.tex_coords = self.c[i][self.t[i].int]
+
+    def _show(self,v,t,i, transparent_batch):
+        face = transparent_batch.add(4,GL_QUADS,t,('v3f',v),('t2f',self.c[i][0]))
+        faces = self.still_faces if i==2 or i==3 else self.flow_faces
+        faces[face] = i; return face
+
+    def show(self, pos, batch):
+        texs = self.get_textures() #Getting textures
+        shown = []
+        vertex_data = cube_vertices_with_sides(*pos)
+        for i in range(0,6):
+            shown += [self._show(vertex_data[i], texs[i], i, batch)]
+        # print("Coords still:",self.coords['still'])
+        # print("flow: ",self.coords['flow'])
+        return shown
+
+
+class Plant(Block):
+
+    def load_tex(self, filepath, color, transparent):
+
+        # GroupClass = PlantGroup
+        # if color:
+        #     print("using color")
+        #     GroupClass = lambda x: BiomeGroup(x, color)
+
+        if not transparent:
+            tex = PlantGroup(image.load(filepath).get_mipmapped_texture())
+            glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST_MIPMAP_LINEAR)
+        else:
+            tex = PlantGroup(image.load(filepath).get_texture())
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST)
+        return tex
+
+    def __init__(self, id, filepath, colors=None ):
+        super(Plant, self).__init__(id,filepath, transparent=True, rigid=False, colors=colors)
+
+        self.texture_top = self.load_tex(filepath[0], None if colors is None else colors[0], transparent=True, )
+        self.texture_bottom = self.load_tex(filepath[1], None if colors is None else colors[1], transparent=True)
+        self.texture_left = self.load_tex(filepath[2], None if colors is None else colors[2], transparent=True)
+        self.texture_right = self.load_tex(filepath[3], None if colors is None else colors[3], transparent=True)
+        self.texture_front = self.load_tex(filepath[4], None if colors is None else colors[4], transparent=True)
+        self.texture_back = self.load_tex(filepath[5], None if colors is None else colors[5], transparent=True)
+
+    def show(self, pos, batch):
+        v = grass_verts(pos)
+        vl = []
+        texture = self.get_textures()[0]
+
+        for i in v:
+            vl += [batch.add(4, GL_QUADS, texture, ('v3f', i), ('t2f', (0, 0, 1, 0, 1, 1, 0, 1)))]
+
+        return vl
+
+class Air():
+
+    def __init__(self, id):
+        self.id = id
+        self.collision = True
+
+
+    def show(self):
+        pass
+
+
+
+stone_block = Block(1, ['textures/block/stone.png'] * 6, right_click=sample)
+sand_block = Block(2, ['textures/block/sand.png'] * 6 )
+brick_block = Block(3, ['textures/block/bricks.png'] * 6 )
+bedrock_block = Block(4, ['textures/block/bedrock.png'] * 6, )
+acacia_leaves_block = Block(5, ['textures/block/acacia_leaves.png']*6,  transparent=True, colors=[(0, 124/255, 0, 1)]*6)
+acacia_sapling_block = Plant(6, ['textures/block/acacia_sapling.png']*6)
+blue_concrete_powder_block = Block(7, ['textures/block/blue_concrete_powder.png']*6,  transparent=False)
+dirt_block = Block(8, ['textures/block/dirt.png']*6 )
+snow_block = Block(9, ['textures/block/snow.png']*6 )
+diamondore_block = Block(10, ['textures/block/diamond_ore.png']*6)
+coalore_block = Block(11, ['textures/block/coal_ore.png']*6)
+gravel_block = Block(12, ['textures/block/gravel.png']*6)
+ironore_block = Block(13, ['textures/block/iron_ore.png']*6)
+lapisore_block = Block(14, ['textures/block/lapis_ore.png']*6)
+quartz_block = Block(15, ['textures/block/quartz_block_top.png', 'textures/block/quartz_block_bottom.png']+['textures/block/quartz_block_side.png']*4 )
+clay_block = Block(17, ['textures/block/clay.png']*6)
+nether_block = Block(18, ['textures/block/netherrack.png']*6)
+nether_quartz_ore_block = Block(19, ['textures/block/nether_quartz_ore.png']*6)
+soulsand_block = Block(20, ['textures/block/soul_sand.png']*6)
+ice_block = Block(21, ['textures/block/ice.png']*6)
+sandstone_block = Block(21, ['textures/block/sandstone_top.png','textures/block/sandstone_bottom.png',]+['textures/block/sandstone.png']*4)
+
+grass_top_color = (127/255, 178/255, 56/255, 1.1)  # Point 1 - 4
+                   # 0, 153, 0, 0,  # Point 2
+                   # 0, 153, 0, 0,  # Point 2
+                   # 0, 153, 0, 0)  # Point 4
+
+grass_block = Block(16,
+              ['textures/block/grass_block_top.png', 'textures/block/dirt.png'] + ['textures/block/grass_block_side.png'] * 4,
+              colors=[grass_top_color, None, None, None, None, None], place_function=grass_on_place)
+snowgrass_block = Block(23,
+              ['textures/block/snow.png', 'textures/block/dirt.png'] + ['textures/block/grass_block_snow.png'] * 4,
+              colors=None)
+
+water_block = Liquid(22, ['Minecraft_2/Minecraft/textures/water_still.png']*6)
+
+air_block = Air(24)
+
+melon_block = Block(23, ['textures/block/melon_top.png']*2+['textures/block/melon_side.png']*4)
+pumpkin_block = Block(24, ['textures/block/pumpkin_top.png']*2+['textures/block/pumpkin_side.png']*4)
+
+yflowers_block = sunflower_block = Block(25, ['textures/block/pumpkin_top.png', 'textures/block/sunflower_bottom.png','textures/block/sunflower_bottom.png', 'textures/block/sunflower_front.png', 'textures/block/sunflower_front.png', 'textures/block/sunflower_front.png', 'textures/block/sunflower_back.png']) #TODO: solve heavy mystery
+
+

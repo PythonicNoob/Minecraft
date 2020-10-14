@@ -13,7 +13,11 @@ from pyglet.gl import *
 from pyglet.graphics import TextureGroup
 from pyglet.window import key, mouse
 
-from blocks import grass, sand, stone, bedrock, brick, acacia_leaves, acacia_sapling
+# from blocks import grass_block, sand_block, stone_block, bedrock_block, brick_block, acacia_leaves_block, acacia_sapling_block, blue_concrete_powder_block, water_block
+from blocks import *
+from blocks import Plant, Liquid, Block
+
+from terrain import TerrainGeneratorSimple, TerrainGenerator
 
 TICKS_PER_SEC = 60
 
@@ -37,7 +41,9 @@ TERMINAL_VELOCITY = 50
 
 PLAYER_HEIGHT = 2
 
-
+def sector_to_blockpos(secpos):
+    x,y,z = secpos
+    return x*8, y*8, z*8
 
 if sys.version_info[0] >= 3:
     xrange = range
@@ -95,10 +101,10 @@ def grass_verts(pos,n=0.5):
 
 TEXTURE_PATH = 'texture.png'
 
-GRASS = tex_coords((1, 0), (0, 1), (0, 0))
-SAND = tex_coords((1, 1), (1, 1), (1, 1))
-BRICK = tex_coords((2, 0), (2, 0), (2, 0))
-STONE = tex_coords((2, 1), (2, 1), (2, 1))
+# GRASS = tex_coords((1, 0), (0, 1), (0, 0))
+# SAND = tex_coords((1, 1), (1, 1), (1, 1))
+# BRICK = tex_coords((2, 0), (2, 0), (2, 0))
+# STONE = tex_coords((2, 1), (2, 1), (2, 1))
 
 FACES = [
     ( 0, 1, 0), # TOP
@@ -136,7 +142,7 @@ def sectorize(position): #basically chunks
     """
     x, y, z = normalize(position)
     x, y, z = x // SECTOR_SIZE, y // SECTOR_SIZE, z // SECTOR_SIZE
-    return (x, 0, z)
+    return (x, y, z)
 
 
 class Model(object):
@@ -145,8 +151,9 @@ class Model(object):
 
         # A Batch is a collection of vertex lists for batched rendering.
         self.batch = pyglet.graphics.Batch()
-
-
+        self.transparent_batch = pyglet.graphics.Batch()
+        # self.plants_batch = pyglet.graphics.Batch()
+        # water_block.set_transparent(self.transparent_batch)
         # A TextureGroup manages an OpenGL texture.
         self.group = TextureGroup(image.load(TEXTURE_PATH).get_texture())
 
@@ -169,42 +176,89 @@ class Model(object):
 
         self._initialize()
 
+    def generate_vegetation(self, *args):
+        pass
+        # TODO: implement gen vegetation
+
+    def init_block(self, position, block):
+        self.add_block_new(position, block, False)
+
     def _initialize(self):
         """ Initialize the world by placing all the blocks.
         """
-        n = 80  # 1/2 width and height of world
+        n = 10  # 1/2 width and height of world
         s = 1  # step size
         y = 0  # initial y height
-        for x in xrange(-n, n + 1, s):
-            for z in xrange(-n, n + 1, s):
-                # create a layer stone an grass everywhere.
-                self.add_block_new((x, y - 2, z), grass, immediate=False)
-                self.add_block_new((x, y - 3, z), bedrock, immediate=False)
-                if x in (-n, n) or z in (-n, n):
-                    # create outer walls.
-                    for dy in xrange(-2, 3):
-                        self.add_block_new((x, y + dy, z), bedrock, immediate=False)
 
-        # generate the hills randomly
-        o = n - 10
-        for _ in xrange(120):
-            a = random.randint(-o, o)  # x position of the hill
-            b = random.randint(-o, o)  # z position of the hill
-            c = -1  # base of the hill
-            h = random.randint(1, 6)  # height of the hill
-            s = random.randint(4, 8)  # 2 * s is the side length of the hill
-            d = 1  # how quickly to taper off the hills
-            # t = random.choice([GRASS, SAND, BRICK])
-            t = random.choice([grass, sand, brick])
-            for y in xrange(c, c + h):
-                for x in xrange(a - s, a + s + 1):
-                    for z in xrange(b - s, b + s + 1):
-                        if (x - a) ** 2 + (z - b) ** 2 > (s + 1) ** 2:
-                            continue
-                        if (x - 0) ** 2 + (z - 0) ** 2 < 5 ** 2:
-                            continue
-                        self.add_block_new((x, y, z), t, immediate=False)
-                s -= d  # decrement side lenth so hills taper off
+        self.terraingen = TerrainGeneratorSimple(self, "573947210")
+        self.open_sector((0,0,0))
+
+        # self.open_sector((0,0,1))
+        # self.open_sector((0,0,5))
+
+        # self.open_sector((-1, 0, 0))
+        # self.open_sector((0, -1, 0))
+        # self.open_sector((-1, -1, 0))
+        # self.open_sector((-1, 0, 0))
+        # self.open_sector((0, -1, 0))
+
+        # self.terraingen = TerrainGenerator(573947210)
+        # self.sectors[0,0,0] = self.terraingen.generate_chunk(0,0,0).blocks
+
+
+        # self.open_sector((0, 0, 33))
+        # self.open_sector((0, 0, 66))
+        # self.open_sector((0, 0, 99))
+        # for x in xrange(-n, n + 1, s):
+        #     for z in xrange(-n, n + 1, s):
+        #         # create a layer stone an grass everywhere.
+        #         self.add_block_new((x, y - 2, z), grass_block, immediate=False)
+        #         self.add_block_new((x, y - 3, z), bedrock_block, immediate=False)
+        #         if x in (-n, n) or z in (-n, n):
+        #             # create outer walls.
+        #             for dy in xrange(-2, 3):
+        #                 self.add_block_new((x, y + dy, z), bedrock_block, immediate=False)
+        #
+        # # generate the hills randomly
+        # o = n - 10
+        # for _ in xrange(120):
+        #     a = random.randint(-o, o)  # x position of the hill
+        #     b = random.randint(-o, o)  # z position of the hill
+        #     c = -1  # base of the hill
+        #     h = random.randint(1, 6)  # height of the hill
+        #     s = random.randint(4, 8)  # 2 * s is the side length of the hill
+        #     d = 1  # how quickly to taper off the hills
+        #     # t = random.choice([GRASS, SAND, BRICK])
+        #     t = random.choice([grass_block, sand_block, brick_block])
+        #     for y in xrange(c, c + h):
+        #         for x in xrange(a - s, a + s + 1):
+        #             for z in xrange(b - s, b + s + 1):
+        #                 if (x - a) ** 2 + (z - b) ** 2 > (s + 1) ** 2:
+        #                     continue
+        #                 if (x - 0) ** 2 + (z - 0) ** 2 < 5 ** 2:
+        #                     continue
+        #                 self.add_block_new((x, y, z), t, immediate=False)
+        #         s -= d  # decrement side lenth so hills taper off
+
+    def open_sector(self, sector):
+        #The sector is not in memory, load or create it
+            #The sector doesn't exist yet, generate it!
+
+        # print("opening sector: ",sector)
+
+        bx, by, bz = sector_to_blockpos(sector)
+        rx, ry, rz = bx//32*32, by//32*32, bz//32*32
+
+        x,y,z = sector
+
+        self.terraingen.generate_sector((x, y, z))
+
+        #For ease of saving/loading, queue up generation of a whole region (4x4x4 sectors) at once
+        # yiter, ziter = range(ry//8,ry//8+4), range(rz//8,rz//8+4)
+        # for secx in range(rx//8,rx//8+4):
+        #     for secy in yiter:
+        #         for secz in ziter:
+        #             self.terraingen.generate_sector((secx,secy,secz))
 
     def hit_test(self, position, vector, max_distance=8):
         """ Line of sight search from current position. If a block is
@@ -281,6 +335,9 @@ class Model(object):
             self.remove_block(position, immediate)
         self.world[position] = block
         self.sectors.setdefault(sectorize(position), []).append(position)
+
+
+
         if immediate:
             if self.exposed(position):
                 self.show_block_new(position)
@@ -295,6 +352,9 @@ class Model(object):
         immediate : bool
             Whether or not to immediately remove block from canvas.
         """
+
+
+        # if self.world.get(position, None):
         del self.world[position]
         self.sectors[sectorize(position)].remove(position)
         if immediate:
@@ -355,42 +415,6 @@ class Model(object):
         else:
             self._enqueue(self._show_block_new, position, block)
 
-    def _show_block_plant(self, position, texture):
-        v = grass_verts(position)
-        vl = []
-
-        for i in v:
-            vl += [self.batch.add(4, GL_QUADS, texture, ('v3f', i), ('t2f', (0, 0, 1, 0, 1, 1, 0, 1)))]
-        self._shown[position] = vl
-
-    def _show_block_block(self, position, block_tex):
-
-        x, y, z = position
-        vertex_data = cube_vertices_with_sides(x, y, z, 0.5)
-        texture_data = (0, 0, 1, 0, 1, 1, 0, 1)
-
-        self._shown[position] = [self.batch.add(4, GL_QUADS, block_tex[0],
-                                                ('v3f/static', vertex_data[0]),
-                                                ('t2f/static', texture_data)),  # top
-
-                                 self.batch.add(4, GL_QUADS, block_tex[2],
-                                                ('v3f/static', vertex_data[2]),
-                                                ('t2f/static', texture_data)),  # left
-
-                                 self.batch.add(4, GL_QUADS, block_tex[3],
-                                                ('v3f/static', vertex_data[3]),
-                                                ('t2f/static', texture_data)),  # right
-
-                                 self.batch.add(4, GL_QUADS, block_tex[4],
-                                                ('v3f/static', vertex_data[4]),
-                                                ('t2f/static', texture_data)),  # front
-                                 self.batch.add(4, GL_QUADS, block_tex[5],
-                                                ('v3f/static', vertex_data[5]),
-                                                ('t2f/static', texture_data)),  # back
-
-                                 self.batch.add(4, GL_QUADS, block_tex[1],
-                                                ('v3f/static', vertex_data[1]),
-                                                ('t2f/static', texture_data))]  # bottom
 
     def _show_block_new(self, position, block):
         """ Private implementation of the `show_block()` method.
@@ -402,20 +426,32 @@ class Model(object):
             The coordinates of the texture squares. Use `tex_coords()` to
             generate.
         """
+
+        if isinstance(block, Liquid):
+            self._shown[position] = block.show(position, self.transparent_batch)
+        else:
+            self._shown[position] = block.show(position, self.batch)
+        # elif isinstance(block, Plant):
+        #     self._shown[position] = block.show(position, self.plants_batch)
+        # elif isinstance(block, Block):
+        #     self._shown[position] = block.show(position, self.batch)
+
         # x, y, z = position
         # vertex_data = cube_vertices_with_sides(x, y, z, 0.5)
         # texture_data = (0,0, 1,0, 1,1, 0,1)
         # texture_data = list(texture)
         # create vertex list
         # FIXME Maybe `add_indexed()` should be used instead
-        block_tex = block.get_textures()
-        block_col = block.get_colors()
-        block_type = block.get_type()
-
-        if block_type == 'block':
-            self._show_block_block(position, block_tex)
-        elif block_type == 'plant':
-            self._show_block_plant(position, block_tex[0])
+        # block_tex = block.get_textures()
+        # block_col = block.get_colors()
+        # block_type = block.get_type()
+        #
+        # if block_type == 'block':
+        #     self._show_block_block(position, block_tex)
+        # elif block_type == 'plant':
+        #     self._show_block_plant(position, block_tex[0])
+        # elif block_type == 'liquid':
+        #     self._shown[position] = block.show(position, vertex_data)
 
 
     def _show_block(self, position, texture):
@@ -462,6 +498,11 @@ class Model(object):
         """ Ensure all blocks in the given sector that should be shown are
         drawn to the canvas.
         """
+
+        if sector not in self.sectors:
+            self.open_sector(sector)
+
+
         for position in self.sectors.get(sector, []):
             if position not in self.shown and self.exposed(position):
                 self.show_block_new(position, False)
@@ -470,6 +511,7 @@ class Model(object):
         """ Ensure all blocks in the given sector that should be hidden are
         removed from the canvas.
         """
+
         for position in self.sectors.get(sector, []):
             if position in self.shown:
                 self.hide_block(position, False)
@@ -483,7 +525,7 @@ class Model(object):
         after_set = set()
         pad = 4
         for dx in xrange(-pad, pad + 1):
-            for dy in [0]:  # xrange(-pad, pad + 1):
+            for dy in xrange(-2, 1): # [0]:  # xrange(-pad, pad + 1):
                 for dz in xrange(-pad, pad + 1):
                     if dx ** 2 + dy ** 2 + dz ** 2 > (pad + 1) ** 2:
                         continue
@@ -549,7 +591,7 @@ class Window(pyglet.window.Window):
 
         # Current (x, y, z) position in the world, specified with floats. Note
         # that, perhaps unlike in math class, the y-axis is the vertical axis.
-        self.position = (0, 0, 0)
+        self.position = (0, 60, 0)
 
         # First element is rotation of the player in the x-z plane (ground
         # plane) measured from the z-axis down. The second is the rotation
@@ -573,7 +615,7 @@ class Window(pyglet.window.Window):
 
         # A list of blocks the player can place. Hit num keys to cycle.
         # self.inventory = [BRICK, GRASS, SAND]
-        self.inventory = [brick, grass, sand, stone, acacia_leaves, acacia_sapling]
+        self.inventory = [brick_block, grass_block, sand_block, stone_block, acacia_leaves_block, acacia_sapling_block, blue_concrete_powder_block, water_block]
 
         # The current block the user can place. Hit num keys to cycle.
         self.block = self.inventory[0]
@@ -702,6 +744,7 @@ class Window(pyglet.window.Window):
         x, y, z = self.position
         x, y, z = self.collide((x + dx, y + dy, z + dz), PLAYER_HEIGHT)
         self.position = (x, y, z)
+        water_block.update(dt)
 
     def collide(self, position, height):
         """ Checks to see if the player at the given `position` and `height`
@@ -724,6 +767,15 @@ class Window(pyglet.window.Window):
         pad = 0.25
         p = list(position)
         np = normalize(position)
+
+        # try:
+        #     if not self.model.world[np].collision:
+        #         return tuple(p)
+        # except KeyError: # KeyError because block does not exist if block does not exist then no collision
+        #     return tuple(p)
+
+        # print("self.model.world[np]:",self.model.world[np])
+
         for face in FACES:  # check all surrounding blocks
             for i in xrange(3):  # check each dimension independently
                 if not face[i]:
@@ -736,7 +788,7 @@ class Window(pyglet.window.Window):
                     op = list(np)
                     op[1] -= dy
                     op[i] += face[i]
-                    if tuple(op) not in self.model.world:
+                    if tuple(op) not in self.model.world or not self.model.world[tuple(op)].collision:
                         continue
                     p[i] -= (d - pad) * face[i]
                     if face == (0, -1, 0) or face == (0, 1, 0):
@@ -746,6 +798,26 @@ class Window(pyglet.window.Window):
                     break
         return tuple(p)
 
+    def right_click(self, previous, click_pos):
+        right_click_action = self.model.shown[click_pos].right_click_press()
+        if right_click_action is not None:
+            # Peform right click action, open chests, inventory, place water etc.
+            print("Performing action: ", right_click_action)
+        else:
+            # grass should turn to dirt.
+            # Other conditions also can be added by checkking with blocks
+            # Like for plants can be checked if growable nearby
+            # Grass, Flowers etc. should be removed
+            # Water should also bre removed
+
+            x, y, z = previous
+            y -= 1
+            if self.model.world.get((x, y, z), None):
+                if self.model.world[x,y,z] == grass_block:
+                    self.model.remove_block((x, y, z), immediate=True)
+                    self.model.add_block_new((x, y, z), dirt_block, immediate=True)
+            self.model.add_block_new(previous, self.block)
+            self.block.on_place(previous, self.model)
     def on_mouse_press(self, x, y, button, modifiers):
         """ Called when a mouse button is pressed. See pyglet docs for button
         amd modifier mappings.
@@ -769,14 +841,10 @@ class Window(pyglet.window.Window):
                 # ON OSX, control + left click = right click.
                 if previous:
                     # print("right click block:",self.block)
-                    right_click_action = self.model.shown[block].right_click_press()
-                    if right_click_action is not None:
-                        print("Performing action: ", right_click_action)
-                    else:
-                        self.model.add_block_new(previous, self.block)
+                    self.right_click(previous, block)
             elif button == pyglet.window.mouse.LEFT and block:
                 texture = self.model.world[block]
-                if texture != bedrock: #TODO: Over here make sure STONE is changed to stone if new system works!
+                if texture != bedrock_block: #TODO: Over here make sure STONE is changed to stone if new system works!
                     # print("left click block:", block)
                     self.model.remove_block(block)
 
@@ -919,6 +987,16 @@ class Window(pyglet.window.Window):
         glEnable(GL_ALPHA_TEST)
         self.model.batch.draw()
         glDisable (GL_ALPHA_TEST)
+
+        glColorMask(GL_FALSE, GL_FALSE, GL_FALSE, GL_FALSE);
+        self.model.transparent_batch.draw()
+        glColorMask(GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE);
+        self.model.transparent_batch.draw()
+
+        # glDisable(GL_CULL_FACE)
+        # self.model.plants_batch.draw()
+        # glEnable(GL_CULL_FACE)
+
         self.draw_focused_block()
         self.set_2d()
         self.draw_label()

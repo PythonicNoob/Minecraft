@@ -7,6 +7,7 @@ import random
 # Third-party packages
 from perlin import SimplexNoise
 
+# Modules from this project
 class FastRandom:
     seed: int
     def __init__(self, seed):
@@ -15,6 +16,9 @@ class FastRandom:
     def randint(self) -> int:
         self.seed = (214013 * self.seed + 2531011)
         return (self.seed >> 16) & 0x7FFF
+
+
+# Modules from this project
 
 __all__ = ('SimplexNoiseGen', 'PerlinNoise')
 
