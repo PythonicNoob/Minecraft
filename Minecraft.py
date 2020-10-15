@@ -8,6 +8,9 @@ import time
 import pickle
 
 from collections import deque
+from concurrent.futures.thread import ThreadPoolExecutor
+from multiprocessing import Pool
+
 from pyglet import image
 from pyglet.gl import *
 from pyglet.graphics import TextureGroup
@@ -18,6 +21,9 @@ from blocks import *
 from blocks import Plant, Liquid, Block
 
 from terrain import TerrainGeneratorSimple, TerrainGenerator
+from nature import Trunk, Tree, SmallPlant
+
+# import threading
 
 TICKS_PER_SEC = 60
 
@@ -170,15 +176,59 @@ class Model(object):
         # Mapping from sector to a list of positions inside that sector.
         self.sectors = {}
 
+        self.to_draw_nature = set()
+
         # Simple function queue implementation. The queue is populated with
         # _show_block() and _hide_block() calls
         self.queue = deque()
 
         self._initialize()
 
-    def generate_vegetation(self, *args):
-        pass
-        # TODO: implement gen vegetation
+    def generate_vegetation(self, pos, veg):
+        x, y, z = pos
+        if veg is None: return
+        print("veg:", veg, "type veg: ", type(veg))
+        if issubclass(veg, SmallPlant):
+
+            print("Is subclass veg of smallplant")
+
+            block = veg.block
+            print("block:",block)
+            grows_on = veg.grows_on
+            #
+            below_block = self.world.get((x, y-1, z), None)
+
+            if below_block is None or below_block in grows_on:
+                if pos in self.world:
+                    self.remove_block(pos, immediate=False)
+                self.world[pos] = block
+                self.sectors.setdefault(sectorize(pos), []).append(pos)
+                # self.to_draw_nature.add( (pos, block) )
+                # pass
+                # self.add_block_new(pos, grass_block)
+
+        elif issubclass(veg, Tree):
+            print("tree subclass")
+
+        elif issubclass(veg, Trunk):
+            # print("truunk subclass")
+            block = veg.block
+            grows_on = veg.grows_on
+            height = random.randint(*veg.height_range)
+            below_block = self.world.get((x, y - 1, z), None)
+
+            if below_block is None or below_block in grows_on:
+                x, y, z = pos
+                for dy in range(1, height+1):
+                    new_pos = x, y+dy, z
+                    if new_pos in self.world:
+                        self.remove_block(new_pos, immediate=False)
+                    self.world[new_pos] = block
+                    self.sectors.setdefault(sectorize(new_pos), []).append(new_pos)
+
+        # print("gen_vegetation:",*args)
+        # pass
+        # TODOwwwwwwwwwww: implement gen vegetation
 
     def init_block(self, position, block):
         self.add_block_new(position, block, False)
@@ -186,13 +236,19 @@ class Model(object):
     def _initialize(self):
         """ Initialize the world by placing all the blocks.
         """
-        n = 10  # 1/2 width and height of world
-        s = 1  # step size
-        y = 0  # initial y height
+        # n = 10  # 1/2 width and height of world
+        # s = 1  # step size
+        # y = 0  # initial y height
 
         self.terraingen = TerrainGeneratorSimple(self, "573947210")
-        self.open_sector((0,0,0))
-
+        # a = time.time()
+        # print(sectorize((0,60, 0)))
+        with ThreadPoolExecutor(max_workers=20) as executor:
+            for x in range(-5, 5):
+                for y in range(0,4):
+                    for z in range(-5, 5):
+                        executor.submit(self.open_sector, (x,y,z) )
+        # print("time take to generate sector 0,60,0 :", time.time()-a)
         # self.open_sector((0,0,1))
         # self.open_sector((0,0,5))
 
@@ -500,13 +556,19 @@ class Model(object):
         """
 
         if sector not in self.sectors:
+            # a= time.time()
             self.open_sector(sector)
+            # print("time taken to generate sector:", time.time()-a)
 
-
+        # with ThreadPoolExecutor(max_workers=20) as executor:
+        # a = time.time()
+        # print("Showing sector:", sector)
         for position in self.sectors.get(sector, []):
-            if position not in self.shown and self.exposed(position):
-                self.show_block_new(position, False)
 
+            if position not in self.shown and self.exposed(position):
+                    # executor.submit(self.show_block_new, position, False)
+                    self.show_block_new(position, False)
+        # print("time taken to show 1 sector: ", time.time()-a)
     def hide_sector(self, sector):
         """ Ensure all blocks in the given sector that should be hidden are
         removed from the canvas.
@@ -516,16 +578,16 @@ class Model(object):
             if position in self.shown:
                 self.hide_block(position, False)
 
-    def change_sectors(self, before, after):   #TODO: Need to understand
+    def change_sectors(self, before, after):
         """ Move from sector `before` to sector `after`. A sector is a
         contiguous x, y sub-region of world. Sectors are used to speed up
         world rendering.
         """
         before_set = set()
         after_set = set()
-        pad = 4
+        pad = 3
         for dx in xrange(-pad, pad + 1):
-            for dy in xrange(-2, 1): # [0]:  # xrange(-pad, pad + 1):
+            for dy in  [-1, 0, 1]:  # xrange(-pad, pad + 1):
                 for dz in xrange(-pad, pad + 1):
                     if dx ** 2 + dy ** 2 + dz ** 2 > (pad + 1) ** 2:
                         continue
@@ -537,8 +599,12 @@ class Model(object):
                         after_set.add((x + dx, y + dy, z + dz))
         show = after_set - before_set
         hide = before_set - after_set
+        # with ThreadPoolExecutor(max_workers=20) as executor:
+            # for sector in show:
+                # print("threading  pool execut opening sector:",sector)
+                # executor.submit(self.show_sector, sector)
         for sector in show:
-            self.show_sector(sector)
+                self.show_sector(sector)
         for sector in hide:
             self.hide_sector(sector)
 
@@ -560,8 +626,13 @@ class Model(object):
         add_block() or remove_block() was called with immediate=False
         """
         start = time.perf_counter() # TODO: .clock() vs process_time() vs perf_counter()
-        while self.queue and time.perf_counter() - start < 1.0 / TICKS_PER_SEC:
-            self._dequeue()
+        # with ThreadPoolExecutor(max_workers=10) as executor:
+        # with Pool() as p:
+        while self.queue and time.perf_counter() - start < 2.0 / TICKS_PER_SEC:
+                # print("processing queue")
+                # p.apply(self._dequeue)
+                self._dequeue()
+                # executor.submit(self._dequeue)
 
     def process_entire_queue(self):
         """ Process the entire queue with no breaks.
@@ -615,7 +686,7 @@ class Window(pyglet.window.Window):
 
         # A list of blocks the player can place. Hit num keys to cycle.
         # self.inventory = [BRICK, GRASS, SAND]
-        self.inventory = [brick_block, grass_block, sand_block, stone_block, acacia_leaves_block, acacia_sapling_block, blue_concrete_powder_block, water_block]
+        self.inventory = [brick_block, grass_block, sand_block, stone_block, acacia_leaves_block, acacia_sapling_block, blue_concrete_powder_block, water_block, yflowers_block]
 
         # The current block the user can place. Hit num keys to cycle.
         self.block = self.inventory[0]
@@ -718,6 +789,9 @@ class Window(pyglet.window.Window):
             self._update(dt / m)
 
     def _update(self, dt):
+
+        # print("queue len:", len(self.model.queue))
+
         """ Private implementation of the `update()` method. This is where most
         of the motion logic lives, along with gravity and collision detection.
         Parameters
@@ -727,6 +801,9 @@ class Window(pyglet.window.Window):
         """
         # walking
         # print("world: ",self.model.world)
+
+        # [self.model.add_block_new(x[0], x[1], immediate=False) for x in self.model.to_draw_nature]
+
         speed = FLYING_SPEED if self.flying else WALKING_SPEED
         d = dt * speed # distance covered this tick.
         dx, dy, dz = self.get_motion_vector()
@@ -812,12 +889,22 @@ class Window(pyglet.window.Window):
 
             x, y, z = previous
             y -= 1
+
+            # if '*' in self.model.placeable_on
+
+
             if self.model.world.get((x, y, z), None):
-                if self.model.world[x,y,z] == grass_block:
+
+                if self.model.world[x, y, z] not in self.block.placeable_on and '*' not in self.block.placeable_on:
+                    return
+
+                if self.model.world[x,y,z] == grass_block and isinstance(self.block, Plant) == False:
                     self.model.remove_block((x, y, z), immediate=True)
                     self.model.add_block_new((x, y, z), dirt_block, immediate=True)
+
             self.model.add_block_new(previous, self.block)
             self.block.on_place(previous, self.model)
+
     def on_mouse_press(self, x, y, button, modifiers):
         """ Called when a mouse button is pressed. See pyglet docs for button
         amd modifier mappings.

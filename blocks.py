@@ -5,7 +5,7 @@ import pyglet
 # import numpy as np
 
 __all__ = (
-    'stone_block', 'sand_block', 'brick_block', 'bedrock_block', 'acacia_leaves_block', 'acacia_sapling_block','blue_concrete_powder_block', 'grass_block', 'water_block', 'dirt_block', 'snow_block', 'diamondore_block', 'coalore_block', 'gravel_block','ironore_block','lapisore_block', 'quartz_block','clay_block','nether_block','nether_quartz_ore_block' ,'soulsand_block', 'sandstone_block', 'ice_block', 'snowgrass_block', 'air_block')
+    'stone_block', 'sand_block', 'brick_block', 'bedrock_block', 'acacia_leaves_block', 'acacia_sapling_block','blue_concrete_powder_block', 'grass_block', 'water_block', 'dirt_block', 'snow_block', 'diamondore_block', 'coalore_block', 'gravel_block','ironore_block','lapisore_block', 'quartz_block','clay_block','nether_block','nether_quartz_ore_block' ,'soulsand_block', 'sandstone_block', 'ice_block', 'snowgrass_block', 'air_block', 'melon_block','pumpkin_block', 'yflowers_block', 'potato_block', 'carrot_block', 'rose_block', 'fern_block', 'wildgrass0_block','wildgrass1_block', 'wildgrass0_block', 'wildgrass2_block', 'wildgrass3_block', 'wildgrass4_block', 'wildgrass5_block','wildgrass6_block','wildgrass7_block', 'deadbush_block', 'desertgrass_block', 'cactus_block', 'tallcactus_block','reed_block','oakwood_block','oakleaf_block','junglewood_block','jungleleaf_block','birchwood_block','birchleaf_block')
 
 def grass_on_place(pos, model):
     x, y, z = pos
@@ -16,17 +16,22 @@ def grass_on_place(pos, model):
 
 class PlantGroup(TextureGroup):
 
-    def __init__(self, texture, parent=None):
+    def __init__(self, texture, parent=None, color=None):
         super(PlantGroup, self).__init__(texture, parent)
+        self.color = color
 
     def set_state(self):
         TextureGroup.set_state(self)
         glDisable(GL_CULL_FACE)
 
+        if self.color:
+            glColor4f(*self.color)
+
     def unset_state(self):
         TextureGroup.unset_state(self)
         glEnable(GL_CULL_FACE)
-
+        if self.color:
+            glColor4f(1, 1, 1, 1)
 
 class BiomeGroup(TextureGroup):
 
@@ -89,15 +94,15 @@ class Block():
         return tex
 
 
-    def __init__(self, id, filepath, colors=None, rigid=True, transparent=False, right_click=None, place_function=None):
+    def __init__(self, id, filepath, colors=None, rigid=True, transparent=False, right_click=None, place_function=None, placeable_on=['*'], load_tex=True):
         # self.texture_front = TextureGroup(image.load(filepath[4]).get_texture())
-
-        self.texture_top = self.load_tex(filepath[0], None if colors is None else colors[0], transparent, )
-        self.texture_bottom = self.load_tex(filepath[1], None if colors is None else colors[1], transparent)
-        self.texture_left = self.load_tex(filepath[2], None if colors is None else colors[2], transparent)
-        self.texture_right = self.load_tex(filepath[3], None if colors is None else colors[3], transparent)
-        self.texture_front = self.load_tex(filepath[4], None if colors is None else colors[4], transparent)
-        self.texture_back = self.load_tex(filepath[5], None if colors is None else colors[5], transparent)
+        if load_tex:
+            self.texture_top = self.load_tex(filepath[0], None if colors is None else colors[0], transparent, )
+            self.texture_bottom = self.load_tex(filepath[1], None if colors is None else colors[1], transparent)
+            self.texture_left = self.load_tex(filepath[2], None if colors is None else colors[2], transparent)
+            self.texture_right = self.load_tex(filepath[3], None if colors is None else colors[3], transparent)
+            self.texture_front = self.load_tex(filepath[4], None if colors is None else colors[4], transparent)
+            self.texture_back = self.load_tex(filepath[5], None if colors is None else colors[5], transparent)
 
 
         if colors is not None:
@@ -122,6 +127,7 @@ class Block():
         self.type = type
         self.right_click = right_click
         self.place_function = place_function
+        self.placeable_on = placeable_on
 
     def get_id(self):
         return self.id
@@ -252,21 +258,21 @@ class Plant(Block):
 
     def load_tex(self, filepath, color, transparent):
 
-        # GroupClass = PlantGroup
+        GroupClass = PlantGroup
         # if color:
-        #     print("using color")
-        #     GroupClass = lambda x: BiomeGroup(x, color)
+        # #     print("using color")
+        #     GroupClass = lambda x: PlantGroup(x, color)
 
         if not transparent:
-            tex = PlantGroup(image.load(filepath).get_mipmapped_texture())
+            tex = PlantGroup(image.load(filepath).get_mipmapped_texture(), color=color)
             glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST_MIPMAP_LINEAR)
         else:
-            tex = PlantGroup(image.load(filepath).get_texture())
+            tex = PlantGroup(image.load(filepath).get_texture(), color=color)
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST)
         return tex
 
     def __init__(self, id, filepath, colors=None ):
-        super(Plant, self).__init__(id,filepath, transparent=True, rigid=False, colors=colors)
+        super(Plant, self).__init__(id,filepath, transparent=True, rigid=False, colors=None, load_tex=False)
 
         self.texture_top = self.load_tex(filepath[0], None if colors is None else colors[0], transparent=True, )
         self.texture_bottom = self.load_tex(filepath[1], None if colors is None else colors[1], transparent=True)
@@ -297,9 +303,9 @@ class Air():
 
 
 
-stone_block = Block(1, ['textures/block/stone.png'] * 6, right_click=sample)
-sand_block = Block(2, ['textures/block/sand.png'] * 6 )
-brick_block = Block(3, ['textures/block/bricks.png'] * 6 )
+stone_block = Block(1, ['textures/block/stone.png'] * 6, right_click=sample,)
+sand_block = Block(2, ['textures/block/sand.png'] * 6,)
+brick_block = Block(3, ['textures/block/bricks.png'] * 6, placeable_on=[sand_block] )
 bedrock_block = Block(4, ['textures/block/bedrock.png'] * 6, )
 acacia_leaves_block = Block(5, ['textures/block/acacia_leaves.png']*6,  transparent=True, colors=[(0, 124/255, 0, 1)]*6)
 acacia_sapling_block = Plant(6, ['textures/block/acacia_sapling.png']*6)
@@ -324,7 +330,7 @@ grass_top_color = (127/255, 178/255, 56/255, 1.1)  # Point 1 - 4
                    # 0, 153, 0, 0,  # Point 2
                    # 0, 153, 0, 0)  # Point 4
 
-grass_block = Block(16,
+desertgrass_block = grass_block = Block(16,
               ['textures/block/grass_block_top.png', 'textures/block/dirt.png'] + ['textures/block/grass_block_side.png'] * 4,
               colors=[grass_top_color, None, None, None, None, None], place_function=grass_on_place)
 snowgrass_block = Block(23,
@@ -338,6 +344,33 @@ air_block = Air(24)
 melon_block = Block(23, ['textures/block/melon_top.png']*2+['textures/block/melon_side.png']*4)
 pumpkin_block = Block(24, ['textures/block/pumpkin_top.png']*2+['textures/block/pumpkin_side.png']*4)
 
-yflowers_block = sunflower_block = Block(25, ['textures/block/pumpkin_top.png', 'textures/block/sunflower_bottom.png','textures/block/sunflower_bottom.png', 'textures/block/sunflower_front.png', 'textures/block/sunflower_front.png', 'textures/block/sunflower_front.png', 'textures/block/sunflower_back.png']) #TODO: solve heavy mystery
+sunflower_block = Block(25, ['textures/block/sunflower_top.png', 'textures/block/sunflower_bottom.png', 'textures/block/sunflower_front.png', 'textures/block/sunflower_front.png', 'textures/block/sunflower_front.png', 'textures/block/sunflower_back.png']) #TODO: solve heavy mystery
 
 
+potato_stage0_block = potato_block = Plant(26, ['textures/block/potatoes_stage0.png']*6)
+# potato_block = Plant(26, ['textures/block/potatoes_stage0.png']*6)
+carrot_stage0_block = carrot_block = Plant(27, ['textures/block/carrots_stage0.png']*6)
+rose_bush_bottom_block = rose_block = Plant(27, ['textures/block/rose_bush_bottom.png']*6)
+fern_block = Plant(28, ['textures/block/fern.png']*6, colors=[(0, 124/255, 0, 1)]*6) #TODO: fern add color
+tall_grass_top_block = wildgrass0_block = Plant(29, ['textures/block/tall_grass_top.png']*6, colors=[(	0, 124/255, 0, 1)]*6)
+wildgrass1_block = Plant(29, ['textures/block/tall_grass_top.png']*6, colors=[(	0, 124/255, 0, 1)]*6)
+wildgrass2_block = Plant(30, ['textures/block/tall_grass_top.png']*6, colors=[(	0, 124/255, 0, 1)]*6)
+wildgrass3_block = Plant(31, ['textures/block/tall_grass_top.png']*6, colors=[(	0, 124/255, 0, 1)]*6)
+wildgrass4_block = Plant(32, ['textures/block/tall_grass_top.png']*6, colors=[(	0, 124/255, 0, 1)]*6)
+wildgrass5_block = Plant(33, ['textures/block/tall_grass_top.png']*6, colors=[(	0, 124/255, 0, 1)]*6)
+wildgrass6_block = Plant(34, ['textures/block/tall_grass_top.png']*6, colors=[(	0, 124/255, 0, 1)]*6)
+wildgrass7_block = Plant(35, ['textures/block/tall_grass_top.png']*6, colors=[(	0, 124/255, 0, 1)]*6)
+deadbush_block = Plant(36, ['textures/block/dead_bush.png']*6)
+cactus_block = Block(37, ['textures/block/cactus_top.png','textures/block/cactus_bottom.png']+['textures/block/cactus_side.png']*4, transparent=True)
+tallcactus_block = cactus_block
+reed_block = sugarcane_block = Plant(38, ['textures/block/sugar_cane.png']*6)
+
+oakwood_block = Block(39, ['textures/block/oak_log_top.png']*2+['textures/block/oak_log.png']*4)
+oakleaf_block = Block(40, ['textures/block/oak_leaves.png']*6,  transparent=True, colors=[(0, 124/255, 0, 1)]*6)
+
+junglewood_block = Block(41, ['textures/block/jungle_log_top.png']*2+['textures/block/jungle_log.png']*4)
+jungleleaf_block = Block(42, ['textures/block/jungle_leaves.png']*6,  transparent=True, colors=[(0, 124/255, 0, 1)]*6)
+
+birchwood_block = Block(43, ['textures/block/birch_log_top.png']*2+['textures/block/birch_log.png']*4)
+birchleaf_block = Block(44, ['textures/block/birch_leaves.png']*6,  transparent=True, colors=[(0, 124/255, 0, 1)]*6)
+yflowers_block = Plant(45, ['textures/block/dandelion.png']*6)
