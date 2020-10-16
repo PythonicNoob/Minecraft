@@ -220,7 +220,7 @@ class Model(object):
 
             if below_block is None or below_block in grows_on:
                 x, y, z = pos
-                for dy in range(1, height+1):
+                for dy in range(0, height):
                     new_pos = x, y+dy, z
                     if new_pos in self.world:
                         self.remove_block(new_pos, immediate=False)

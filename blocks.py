@@ -324,7 +324,7 @@ class Cactus(Block):
         block_cols = self.get_colors()
         # print("block cols:", block_cols)
         texture_data = (0, 0, 1, 0, 1, 1, 0, 1)
-        vertex_data = cactus_cube_vertices_with_sides(*pos)
+        vertex_data = cactus_cube_vertices_with_sides(*pos, extra=1)
         shown = []
 
         # vertex_data[0]
