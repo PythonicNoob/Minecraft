@@ -5,7 +5,7 @@ import pyglet
 # import numpy as np
 
 __all__ = (
-    'stone_block', 'sand_block', 'brick_block', 'bedrock_block', 'acacia_leaves_block', 'acacia_sapling_block','blue_concrete_powder_block', 'grass_block', 'water_block', 'dirt_block', 'snow_block', 'diamondore_block', 'coalore_block', 'gravel_block','ironore_block','lapisore_block', 'quartz_block','clay_block','nether_block','nether_quartz_ore_block' ,'soulsand_block', 'sandstone_block', 'ice_block', 'snowgrass_block', 'air_block', 'melon_block','pumpkin_block', 'yflowers_block', 'potato_block', 'carrot_block', 'rose_block', 'fern_block', 'wildgrass0_block','wildgrass1_block', 'wildgrass0_block', 'wildgrass2_block', 'wildgrass3_block', 'wildgrass4_block', 'wildgrass5_block','wildgrass6_block','wildgrass7_block', 'deadbush_block', 'desertgrass_block', 'cactus_block', 'tallcactus_block','reed_block','oakwood_block','oakleaf_block','junglewood_block','jungleleaf_block','birchwood_block','birchleaf_block')
+    'stone_block', 'sand_block', 'brick_block', 'bedrock_block', 'acacia_leaves_block', 'acacia_sapling_block','blue_concrete_powder_block', 'grass_block', 'water_block', 'dirt_block', 'snow_block', 'diamondore_block', 'coalore_block', 'gravel_block','ironore_block','lapisore_block', 'quartz_block','clay_block','nether_block','nether_quartz_ore_block' ,'soulsand_block', 'sandstone_block', 'ice_block', 'snowgrass_block', 'air_block', 'melon_block','pumpkin_block', 'yflowers_block', 'potato_block', 'carrot_block', 'rose_block', 'fern_block', 'wildgrass0_block','wildgrass1_block', 'wildgrass0_block', 'wildgrass2_block', 'wildgrass3_block', 'wildgrass4_block', 'wildgrass5_block','wildgrass6_block','wildgrass7_block', 'deadbush_block', 'cactus_block', 'tallcactus_block','reed_block','oakwood_block','oakleaf_block','junglewood_block','jungleleaf_block','birchwood_block','birchleaf_block')
 
 def grass_on_place(pos, model):
     x, y, z = pos
@@ -374,7 +374,7 @@ grass_top_color = (127/255, 178/255, 56/255, 1.1)  # Point 1 - 4
                    # 0, 153, 0, 0,  # Point 2
                    # 0, 153, 0, 0)  # Point 4
 
-desertgrass_block = grass_block = Block(16,
+grass_block = Block(16,
               ['textures/block/grass_block_top.png', 'textures/block/dirt.png'] + ['textures/block/grass_block_side.png'] * 4,
               colors=[grass_top_color, None, None, None, None, None], place_function=grass_on_place)
 snowgrass_block = Block(23,

@@ -170,8 +170,8 @@ class DeadBush(SmallPlant):
     grows_on = sand_block, sandstone_block
 
 class DesertGrass(SmallPlant):
-    block = desertgrass_block
-    grows_on = sand_block, sandstone_block
+    block = cactus_block
+    grows_on = sand_block, #sandstone_block
 
 #
 # Tall plants
@@ -180,13 +180,13 @@ class DesertGrass(SmallPlant):
 
 class Cactus(Trunk):
     block = cactus_block
-    height_range = 1, 4
+    height_range = 1, 2
     grows_on = sand_block, sandstone_block
 
 
 class TallCactus(Trunk):
     block = tallcactus_block
-    height_range = 1, 10
+    height_range = 1, 3
     grows_on = sand_block, sandstone_block
 
 

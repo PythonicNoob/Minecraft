@@ -411,7 +411,7 @@ class TerrainGeneratorSimple(TerrainGeneratorBase):
 
             # DO when nature is working
 
-            # self.world_type_grass = (YFlowers, Rose, TallGrass)
+            self.world_type_grass = (YFlowers, Rose, TallGrass)
             main_block = grass_block
             self.height_range = 32
             self.height_base = 32
