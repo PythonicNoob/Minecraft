@@ -76,6 +76,21 @@ def cube_vertices_with_sides(x, y, z, n=0.5):
         [x+n,y-n,z-n, x-n,y-n,z-n, x-n,y+n,z-n, x+n,y+n,z-n],  # back
     ]
 
+def cactus_cube_vertices_with_sides(x, y, z, n=0.5, value_reduction=(2,16), extra = 0):
+    """ Return the vertices of the cube at position x, y, z with size 2*n.
+    """
+
+    change = n*((value_reduction[0]+extra)/value_reduction[1]) #adding 1
+
+    return [
+        [x-n,y+n,z-n, x-n,y+n,z+n, x+n,y+n,z+n, x+n,y+n,z-n],  # top
+        [x-n,y-n,z-n, x+n,y-n,z-n, x+n,y-n,z+n, x-n,y-n,z+n],  # bottom
+        [x-n+change,y-n,z-n, x-n+change,y-n,z+n, x-n+change,y+n,z+n, x-n+change,y+n,z-n],  # left
+        [x+n-change,y-n,z+n, x+n-change,y-n,z-n, x+n-change,y+n,z-n, x+n-change,y+n,z+n],  # right
+        [x-n,y-n,z+n-change, x+n,y-n,z+n-change, x+n,y+n,z+n-change, x-n,y+n,z+n-change],  # front
+        [x+n,y-n,z-n+change, x-n,y-n,z-n+change, x-n,y+n,z-n+change, x+n,y+n,z-n+change],  # back
+    ]
+
 class Block():
 
     def load_tex(self, filepath, color, transparent):
@@ -174,8 +189,6 @@ class Block():
 
         # if not self.size:
         for sde in range(0,6): #sde meaning side. Add each side
-
-
             shown += [batch.add(4, GL_QUADS, block_tex[sde], ('v3f/static',vertex_data[sde]),
                                 ('t2f/static', texture_data))]
 
@@ -311,13 +324,14 @@ class Cactus(Block):
         block_cols = self.get_colors()
         # print("block cols:", block_cols)
         texture_data = (0, 0, 1, 0, 1, 1, 0, 1)
-        vertex_data = cube_vertices_with_sides(*pos)
+        vertex_data = cactus_cube_vertices_with_sides(*pos)
         shown = []
 
-        vertex_data[0]
-
-        shown += [batch.add(4, GL_QUADS, block_tex[sde], ('v3f/static', [i * self.size for i in vertex_data[sde]]),
+        # vertex_data[0]
+        for sde in range(0, 6):
+            shown += [batch.add(4, GL_QUADS, block_tex[sde], ('v3f/static', vertex_data[sde]),
                             ('t2f/static', texture_data))]
+        return shown
 
 BLOCKS = {
     'stone_block':( 'stone_block', ['textures/block/stone.png'] * 6),
@@ -391,7 +405,7 @@ wildgrass5_block = Plant(33, ['textures/block/tall_grass_top.png']*6, colors=[(	
 wildgrass6_block = Plant(34, ['textures/block/tall_grass_top.png']*6, colors=[(	0, 124/255, 0, 1)]*6)
 wildgrass7_block = Plant(35, ['textures/block/tall_grass_top.png']*6, colors=[(	0, 124/255, 0, 1)]*6)
 deadbush_block = Plant(36, ['textures/block/dead_bush.png']*6)
-cactus_block = Block(37, ['textures/block/cactus_top.png','textures/block/cactus_bottom.png']+['textures/block/cactus_side.png']*4, transparent=True)
+cactus_block = Cactus(37, ['textures/block/cactus_top.png','textures/block/cactus_bottom.png']+['textures/block/cactus_side.png']*4, transparent=True)
 tallcactus_block = cactus_block
 reed_block = sugarcane_block = Plant(38, ['textures/block/sugar_cane.png']*6)
 
