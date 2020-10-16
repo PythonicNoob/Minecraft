@@ -187,13 +187,13 @@ class Model(object):
     def generate_vegetation(self, pos, veg):
         x, y, z = pos
         if veg is None: return
-        print("veg:", veg, "type veg: ", type(veg))
+        # print("veg:", veg, "type veg: ", type(veg))
         if issubclass(veg, SmallPlant):
 
-            print("Is subclass veg of smallplant")
+            # print("Is subclass veg of smallplant")
 
             block = veg.block
-            print("block:",block)
+            # print("block:",block)
             grows_on = veg.grows_on
             #
             below_block = self.world.get((x, y-1, z), None)
@@ -208,7 +208,8 @@ class Model(object):
                 # self.add_block_new(pos, grass_block)
 
         elif issubclass(veg, Tree):
-            print("tree subclass")
+            # print("tree subclass")
+            pass
 
         elif issubclass(veg, Trunk):
             # print("truunk subclass")
@@ -231,7 +232,10 @@ class Model(object):
         # TODOwwwwwwwwwww: implement gen vegetation
 
     def init_block(self, position, block):
-        self.add_block_new(position, block, False)
+        if position in self.world:
+            self.remove_block(position, immediate=False)
+        self.world[position] = block
+        self.sectors.setdefault(sectorize(position), []).append(position)
 
     def _initialize(self):
         """ Initialize the world by placing all the blocks.
@@ -243,10 +247,10 @@ class Model(object):
         self.terraingen = TerrainGeneratorSimple(self, "573947210")
         # a = time.time()
         # print(sectorize((0,60, 0)))
-        with ThreadPoolExecutor(max_workers=20) as executor:
-            for x in range(-5, 5):
-                for y in range(0,4):
-                    for z in range(-5, 5):
+        with ThreadPoolExecutor(max_workers=200) as executor:
+            for x in range(-8, 8):
+                for y in range(2,5):
+                    for z in range(-8, 8):
                         executor.submit(self.open_sector, (x,y,z) )
         # print("time take to generate sector 0,60,0 :", time.time()-a)
         # self.open_sector((0,0,1))
@@ -302,11 +306,11 @@ class Model(object):
 
         # print("opening sector: ",sector)
 
-        bx, by, bz = sector_to_blockpos(sector)
-        rx, ry, rz = bx//32*32, by//32*32, bz//32*32
+        # bx, by, bz = sector_to_blockpos(sector)
+        # rx, ry, rz = bx//32*32, by//32*32, bz//32*32
 
         x,y,z = sector
-
+        # print("generating sector: ",sector)
         self.terraingen.generate_sector((x, y, z))
 
         #For ease of saving/loading, queue up generation of a whole region (4x4x4 sectors) at once
@@ -548,9 +552,12 @@ class Model(object):
     def _hide_block(self, position):
         """ Private implementation of the 'hide_block()` method.
         """
-        [x.delete() for x in self._shown.pop(position)]
+        try:
+            [x.delete() for x in self._shown.pop(position)]
+        except KeyError:
+            pass
 
-    def show_sector(self, sector):
+    def show_sector(self, sector, immediate=False):
         """ Ensure all blocks in the given sector that should be shown are
         drawn to the canvas.
         """
@@ -560,14 +567,14 @@ class Model(object):
             self.open_sector(sector)
             # print("time taken to generate sector:", time.time()-a)
 
-        # with ThreadPoolExecutor(max_workers=20) as executor:
+        with ThreadPoolExecutor(max_workers=20) as executor:
         # a = time.time()
         # print("Showing sector:", sector)
-        for position in self.sectors.get(sector, []):
+            for position in self.sectors.get(sector, []):
 
-            if position not in self.shown and self.exposed(position):
-                    # executor.submit(self.show_block_new, position, False)
-                    self.show_block_new(position, False)
+                if position not in self.shown and self.exposed(position):
+                    executor.submit(self.show_block_new, position, False)
+                    # self.show_block_new(position, immediate)
         # print("time taken to show 1 sector: ", time.time()-a)
     def hide_sector(self, sector):
         """ Ensure all blocks in the given sector that should be hidden are
@@ -576,7 +583,7 @@ class Model(object):
 
         for position in self.sectors.get(sector, []):
             if position in self.shown:
-                self.hide_block(position, False)
+                self.hide_block(position, True)
 
     def change_sectors(self, before, after):
         """ Move from sector `before` to sector `after`. A sector is a
@@ -585,26 +592,52 @@ class Model(object):
         """
         before_set = set()
         after_set = set()
-        pad = 3
+
+        before_set_instant = set()
+        after_set_instant = set()
+
+        pad = 2
+        instant_loads = 1
         for dx in xrange(-pad, pad + 1):
             for dy in  [-1, 0, 1]:  # xrange(-pad, pad + 1):
                 for dz in xrange(-pad, pad + 1):
                     if dx ** 2 + dy ** 2 + dz ** 2 > (pad + 1) ** 2:
                         continue
+                    if -instant_loads <= dx <= instant_loads and -instant_loads <= dz <= instant_loads and dy==0:
+                        print("dx:", dx,"dy:", dy,"dz:",dz)
+                        # if before:
+                        #     x, y, z = before
+                        #     before_set_instant.add((x + dx, y + dy, z + dz))
+                        if after:
+                            x, y, z = after
+                            after_set_instant.add((x + dx, y + dy, z + dz))
+
                     if before:
                         x, y, z = before
                         before_set.add((x + dx, y + dy, z + dz))
                     if after:
                         x, y, z = after
                         after_set.add((x + dx, y + dy, z + dz))
+
         show = after_set - before_set
         hide = before_set - after_set
-        # with ThreadPoolExecutor(max_workers=20) as executor:
-            # for sector in show:
+
+        show_instant = after_set_instant - show
+        hide.union(before_set_instant-after_set_instant)
+
+        # after_set_instant
+        # hide - {after}
+        # show_instant.add(after)
+
+        # with ThreadPoolExecutor(max_workers=200) as executor:
+        #     for sector in show:
                 # print("threading  pool execut opening sector:",sector)
                 # executor.submit(self.show_sector, sector)
+
+        for sector in show_instant:
+            self.show_sector(sector, True)
         for sector in show:
-                self.show_sector(sector)
+            self.show_sector(sector)
         for sector in hide:
             self.hide_sector(sector)
 

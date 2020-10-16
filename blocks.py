@@ -128,6 +128,7 @@ class Block():
         self.right_click = right_click
         self.place_function = place_function
         self.placeable_on = placeable_on
+        # self.size = size
 
     def get_id(self):
         return self.id
@@ -171,10 +172,11 @@ class Block():
         shown = []
 
 
-
+        # if not self.size:
         for sde in range(0,6): #sde meaning side. Add each side
 
-            shown += [batch.add(4, GL_QUADS, block_tex[sde], ('v3f/static', vertex_data[sde]),
+
+            shown += [batch.add(4, GL_QUADS, block_tex[sde], ('v3f/static',vertex_data[sde]),
                                 ('t2f/static', texture_data))]
 
             # if block_cols[sde]:
@@ -302,8 +304,36 @@ class Air():
         pass
 
 
+class Cactus(Block):
 
-stone_block = Block(1, ['textures/block/stone.png'] * 6, right_click=sample,)
+    def show(self, pos, batch):
+        block_tex = self.get_textures()
+        block_cols = self.get_colors()
+        # print("block cols:", block_cols)
+        texture_data = (0, 0, 1, 0, 1, 1, 0, 1)
+        vertex_data = cube_vertices_with_sides(*pos)
+        shown = []
+
+        vertex_data[0]
+
+        shown += [batch.add(4, GL_QUADS, block_tex[sde], ('v3f/static', [i * self.size for i in vertex_data[sde]]),
+                            ('t2f/static', texture_data))]
+
+BLOCKS = {
+    'stone_block':( 'stone_block', ['textures/block/stone.png'] * 6),
+
+}
+
+PLANTS = {
+    "wild_grass":("wild_grass", ['textures/block/tall_grass_top.png']*6)
+}
+
+LIQUIDS = {
+    "water":("water_still", ['Minecraft_2/Minecraft/textures/water_still.png']*6)
+}
+
+
+stone_block = Block(*BLOCKS['stone_block'], right_click=sample,)
 sand_block = Block(2, ['textures/block/sand.png'] * 6,)
 brick_block = Block(3, ['textures/block/bricks.png'] * 6, placeable_on=[sand_block] )
 bedrock_block = Block(4, ['textures/block/bedrock.png'] * 6, )
@@ -337,7 +367,7 @@ snowgrass_block = Block(23,
               ['textures/block/snow.png', 'textures/block/dirt.png'] + ['textures/block/grass_block_snow.png'] * 4,
               colors=None)
 
-water_block = Liquid(22, ['Minecraft_2/Minecraft/textures/water_still.png']*6)
+water_block = Liquid(*LIQUIDS['water'])
 
 air_block = Air(24)
 
@@ -353,7 +383,7 @@ carrot_stage0_block = carrot_block = Plant(27, ['textures/block/carrots_stage0.p
 rose_bush_bottom_block = rose_block = Plant(27, ['textures/block/rose_bush_bottom.png']*6)
 fern_block = Plant(28, ['textures/block/fern.png']*6, colors=[(0, 124/255, 0, 1)]*6) #TODO: fern add color
 tall_grass_top_block = wildgrass0_block = Plant(29, ['textures/block/tall_grass_top.png']*6, colors=[(	0, 124/255, 0, 1)]*6)
-wildgrass1_block = Plant(29, ['textures/block/tall_grass_top.png']*6, colors=[(	0, 124/255, 0, 1)]*6)
+wildgrass1_block = Plant(*PLANTS["wild_grass"], colors=[(	0, 124/255, 0, 1)]*6)
 wildgrass2_block = Plant(30, ['textures/block/tall_grass_top.png']*6, colors=[(	0, 124/255, 0, 1)]*6)
 wildgrass3_block = Plant(31, ['textures/block/tall_grass_top.png']*6, colors=[(	0, 124/255, 0, 1)]*6)
 wildgrass4_block = Plant(32, ['textures/block/tall_grass_top.png']*6, colors=[(	0, 124/255, 0, 1)]*6)
