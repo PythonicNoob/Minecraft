@@ -5,6 +5,7 @@ import sys
 import math
 import random
 import time
+import threading
 import pickle
 
 from collections import deque
@@ -1258,7 +1259,7 @@ def setup():
 
 
 def main():
-    window = Window(width=800, height=600, caption='Pyglet', resizable=True)
+    window = Window(width=1366, height=768, caption='Pyglet', resizable=True, fullscreen=True)
     # Hide the mouse cursor and prevent the mouse from leaving the window.
     window.set_exclusive_mouse(True)
     setup()
