@@ -604,7 +604,7 @@ class Model(object):
                     if dx ** 2 + dy ** 2 + dz ** 2 > (pad + 1) ** 2:
                         continue
                     if -instant_loads <= dx <= instant_loads and -instant_loads <= dz <= instant_loads and dy==0:
-                        print("dx:", dx,"dy:", dy,"dz:",dz)
+                        #print("dx:", dx,"dy:", dy,"dz:",dz)
                         # if before:
                         #     x, y, z = before
                         #     before_set_instant.add((x + dx, y + dy, z + dz))
