@@ -187,6 +187,7 @@ class Model(object):
     def generate_vegetation(self, pos, veg):
         x, y, z = pos
         if veg is None: return
+        below_block = self.world.get((x, y - 1, z), None)
         # print("veg:", veg, "type veg: ", type(veg))
         if issubclass(veg, SmallPlant):
 
@@ -195,41 +196,77 @@ class Model(object):
             block = veg.block
             # print("block:",block)
             grows_on = veg.grows_on
-            #
-            below_block = self.world.get((x, y-1, z), None)
-
             if below_block is None or below_block in grows_on:
-                if pos in self.world:
-                    self.remove_block(pos, immediate=False)
-                self.world[pos] = block
-                self.sectors.setdefault(sectorize(pos), []).append(pos)
+                self.init_block(pos, block)
+                # if pos in self.world:
+                #     self.remove_block(pos, immediate=False)
+                # self.world[pos] = block
+                # self.sectors.setdefault(sectorize(pos), []).append(pos)
                 # self.to_draw_nature.add( (pos, block) )
                 # pass
                 # self.add_block_new(pos, grass_block)
 
         elif issubclass(veg, Tree):
             # print("tree subclass")
-            pass
+            trunk_block = veg.trunk_block
+            leaf_block = veg.leaf_block
+            height = random.randint(*veg.trunk_height_range)
+
+            if below_block is None or below_block not in veg.grows_on:
+                return
+
+            leafs = veg.generate_leafs(x, y+height-1, z)
+            #
+
+            for h in range(height):
+                self.init_block((x,y+h,z), trunk_block)
+
+            for pos in leafs:
+                self.init_block(pos, leaf_block)
+
+            # d = height // 3 + 1
+            # treetop = y + height
+            # for xl in range(x - d, x + d):
+            #     dx = abs(xl - x)
+            #     for yl in range(treetop - d, treetop + d):
+            #         for zl in range(z - d, z + d):
+            #             # Don't replace existing blocks
+            #             if (xl, yl, zl) in self.world:
+            #                 continue
+            #             # Avoids orphaned leaves
+            #             if not self.has_neighbors((xl, yl, zl),
+            #                                        set((trunk_block,
+            #                                             leaf_block))):
+            #                 continue
+            #             dz = abs(zl - z)
+            #             # The farther we are (horizontally) from the trunk,
+            #             # the least leaves we can find.
+            #             if random.uniform(0, dx + dz) > 0.6:
+            #                 continue
+            #             # world.add_block((xl, yl, zl), cls.leaf_block, force=False,
+            #             #                 sync=sync)
+            #             self.init_block((xl, yl, zl), leaf_block,)
 
         elif issubclass(veg, Trunk):
             # print("truunk subclass")
             block = veg.block
             grows_on = veg.grows_on
             height = random.randint(*veg.height_range)
-            below_block = self.world.get((x, y - 1, z), None)
+            # below_block = self.world.get((x, y - 1, z), None)
 
             if below_block is None or below_block in grows_on:
-                x, y, z = pos
+                # x, y, z = pos
                 for dy in range(0, height):
                     new_pos = x, y+dy, z
-                    if new_pos in self.world:
-                        self.remove_block(new_pos, immediate=False)
-                    self.world[new_pos] = block
-                    self.sectors.setdefault(sectorize(new_pos), []).append(new_pos)
+                    self.init_block(new_pos, block)
+                    # if new_pos in self.world:
+                    #     self.remove_block(new_pos, immediate=False)
+                    # self.world[new_pos] = block
+                    # self.sectors.setdefault(sectorize(new_pos), []).append(new_pos)
 
         # print("gen_vegetation:",*args)
         # pass
-        # TODOwwwwwwwwwww: implement gen vegetation
+        # TODO: implement gen vegetation
 
     def init_block(self, position, block):
         if position in self.world:
@@ -422,7 +459,26 @@ class Model(object):
                 self.hide_block(position)
             self.check_neighbors(position)
 
-    def check_neighbors(self, position):
+    def has_neighbors(self, position, blocks_to_check: list, all=False):
+        x, y, z = position
+        not_found_faces = 0
+        for dx, dy, dz in FACES:
+            key = (x + dx, y + dy, z + dz)
+            if key not in self.world:
+                not_found_faces += 1
+                if all:
+                    return False
+                continue
+            if self.world[key] not in blocks_to_check:
+                not_found_faces += 1
+                if all:
+                    return False
+            else:
+                if not all:
+                    return True
+        return (False if not_found_faces == 6 else True) #If any of them don't find a block they will return false if all is true
+
+    def check_neighbors(self, position, ):
         """ Check all blocks surrounding `position` and ensure their visual
         state is current. This means hiding blocks that are not exposed and
         ensuring that all exposed blocks are shown. Usually used after a block

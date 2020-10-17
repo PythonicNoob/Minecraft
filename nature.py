@@ -90,6 +90,9 @@ class Tree:
                                     sync=sync)
 
 
+    @classmethod
+    def generate_leafs(cls):
+        pass
 #
 # Small plants
 #
@@ -205,18 +208,89 @@ class OakTree(Tree):
     trunk_block = oakwood_block
     leaf_block = oakleaf_block
 
+    @classmethod
+    def generate_leafs(cls, x, y, z):
+        # x, y, z = position
+        leafs = set()
+        leafs.add((x, y + 1, z))
+        leafs.add((x + 1, y + 1, z))
+        leafs.add((x - 1, y + 1, z))
+        leafs.add((x, y + 1, z + 1))
+        leafs.add((x, y + 1, z - 1))
+        for dx in range(-1, 2):
+            for dz in range(-1, 2):
+                if dx != 0 or dz != 0:
+                    leafs.add((x + dx, y, z + dz))
+
+
+
+        for dx in range(-2, 3):
+            for dz in range(-2, 3):
+                for dy in range(1, 3):
+                    if dx != 0 or dz != 0:
+                        leafs.add((x + dx, y - dy, z + dz))
+
+        return leafs
+
+
 
 class JungleTree(Tree):
     trunk_block = junglewood_block
     leaf_block = jungleleaf_block
     trunk_height_range = 8, 12
 
+    @classmethod
+    def generate_leafs(cls, x, y, z):
+        # x, y, z = position
+        leafs = set()
+        leafs.add((x, y + 1, z))
+        leafs.add((x + 1, y + 1, z))
+        leafs.add((x - 1, y + 1, z))
+        leafs.add((x, y + 1, z + 1))
+        leafs.add((x, y + 1, z - 1))
+        for dx in range(-1, 2):
+            for dz in range(-1, 2):
+                if dx != 0 or dz != 0:
+                    leafs.add((x + dx, y, z + dz))
+
+
+
+        for dx in range(-2, 3):
+            for dz in range(-2, 3):
+                for dy in range(1, 3):
+                    if dx != 0 or dz != 0:
+                        leafs.add((x + dx, y - dy, z + dz))
+
+        return leafs
 
 class BirchTree(Tree):
     trunk_block = birchwood_block
     leaf_block = birchleaf_block
     trunk_height_range = 5, 7
 
+    @classmethod
+    def generate_leafs(cls, x, y, z):
+        # x, y, z = position
+        leafs = set()
+        leafs.add((x, y + 1, z))
+        leafs.add((x + 1, y + 1, z))
+        leafs.add((x - 1, y + 1, z))
+        leafs.add((x, y + 1, z + 1))
+        leafs.add((x, y + 1, z - 1))
+        for dx in range(-1, 2):
+            for dz in range(-1, 2):
+                if dx != 0 or dz != 0:
+                    leafs.add((x + dx, y, z + dz))
+
+
+
+        for dx in range(-2, 3):
+            for dz in range(-2, 3):
+                for dy in range(1, 3):
+                    if dx != 0 or dz != 0:
+                        leafs.add((x + dx, y - dy, z + dz))
+
+        return leafs
 
 SMALL_PLANTS = set((
     WaterMelon,
