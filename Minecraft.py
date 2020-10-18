@@ -5,12 +5,9 @@ import sys
 import math
 import random
 import time
-import threading
-import pickle
 
 from collections import deque
 from concurrent.futures.thread import ThreadPoolExecutor
-from multiprocessing import Pool
 
 from pyglet import image
 from pyglet.gl import *
@@ -19,13 +16,12 @@ from pyglet.window import key, mouse
 
 # from blocks import grass_block, sand_block, stone_block, bedrock_block, brick_block, acacia_leaves_block, acacia_sapling_block, blue_concrete_powder_block, water_block
 from blocks import *
-from blocks import Plant, Liquid, Block
+from blocks import Plant, Liquid
 
-from terrain import TerrainGeneratorSimple, TerrainGenerator
+from terrain import TerrainGeneratorSimple
 from nature import Trunk, Tree, SmallPlant
 
 from hotbar import Hotbar
-import glooey
 
 # import threading
 
