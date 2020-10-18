@@ -331,15 +331,60 @@ class Cactus(Block):
         for sde in range(0, 6):
             shown += [batch.add(4, GL_QUADS, block_tex[sde], ('v3f/static', vertex_data[sde]),
                             ('t2f/static', texture_data))]
+
         return shown
 
+# TOP, BOTTOM, LEFT, RIGHT, FRONT, BACK.
+
+#There you go. No errors. thx. wait.
+#lets update the project first
+#Then lesser errors
+#ok?ok
+#Wait let me push the update first
+
+
+#Instructions:
+#Ctrl+T or Update Project
+#Then merge option -> Ok
+
 BLOCKS = {
-    'stone_block':( 'stone_block', ['textures/block/stone.png'] * 6),
+    'stone_block':( 'pinecraft:stone_block', ['textures/block/stone.png'] * 6),
+    'birchleaf_block':('pinecraft:birchleaf_block', ['textures/block/birch_leaves.png']*6),
+    'yellow_wool':('pinecraft:yellow_wool', ['textures/block/yellow_wool.png']*6),
+    'yellow_terracotta':('pinecraft:yellow_terracotta', ['textures/block/yellow_terracotta.png']*6),
+    'smithing_table':('pinecraft:smithing_table', ['textures/block/smithing_table_top.png', 'textures/block/smithing_table_bottom.png'] +['textures/block/smithing_table_side.png']*3 + ['textures/block/smithing_table_front.png']),
+    'oakwood_block':('pinecraft:oak_wood', ['textures/block/oak_log_top.png']*2+['textures/block/oak_log.png']*4),
+    'oakleaf_block':('pinecraft:oak_leaves', ['textures/block/oak_leaves.png']*6),
+    'junglewood_block':('pinecraft:jungle_wood', ['textures/block/jungle_log_top.png']* 2 +['textures/block/jungle_log.png']*4),
+    'jungleleaf_block':('pinecraft:jungle_leaves', ['textures/block/jungle_leaves.png']*6),
+    'birchwood_block':('pinecraft:birch_wood', ['textures/block/birch_log_top.png']* 2 +['textures/block/birch_log.png']*4),
+    'yflower_block':('pinecraft:yellow_flower', ['textures/block/dandelion.png']*6),
+    'white_terracotta':('pinecraft:white_terracotta', ['textures/block/white_terracotta.png']*6),
+    'stripped_acacia_log':('pinecraft:stripped_acacia_log', ['textures/block/stripped_acacia_log_top.png']* 2 +['textures/block/stripped_acacia_log.png']*4),
+    'basalt':('pinecraft:basalt', ['textures/block/basalt_top.png']*2 + ['textures/block/basalt_side.png']*4),
+    'beacon':('pinecraft:beacon', ['textures/block/beacon.png']*6),
+    'ancient_debris':('pinecraft:ancient_debris', ['textures/block/ancient_debris_top.png']*2 + ['textures/block/ancient_debris_side.png']*4),
+    'anvil':('pinecraft:anvil', ['textures/block/anvil_top.png'] + ['textures/block/anvil.png']*5),
+    'bell':('pinecraft:bell', ['textures/block/bell_top.png', 'textures/block/bell_bottom.png'] + ['textures/block/bell_side.png']*4),
+
+
+
 
 }
 
 PLANTS = {
-    "wild_grass":("wild_grass", ['textures/block/tall_grass_top.png']*6)
+    "wild_grass":("pinecraft:wild_grass", ['textures/block/tall_grass_top.png']*6),
+    "potato_stage0_block":("pinecraft:potato", ['textures/block/potatoes_stage0.png']*6),
+    "carrot_stage0_block":("pinecraft:carrot", ['textures/block/carrots_stage0.png']*6),
+    "rose_bush_bottom_block":("pinecraft:rose", ['textures/block/rose_bush_bottom.png']*6),
+    "fern_block":("pinecraft:fern", ['textures/block/fern.png']*6),
+    "tall_grass_top_block":("pinecraft:tall_grass", ['textures/block/tall_grass_top.png']*6),
+    "wildgrass_block":("pinecraft:wildgrass", ['textures/block/tall_grass_top.png']*6),
+    "deadbush_block":("pinecraft:dead_bush", ['textures/block/dead_bush.png']*6),
+    "cactus_block":("pinecraft:cactus", ['textures/block/cactus_top.png','textures/block/cactus_bottom.png']+['textures/block/cactus_side.png']*4),
+    "sugarcane_block":("pinecraft:sugarcane", ['textures/block/sugar_cane.png']*6),
+
+
 }
 
 LIQUIDS = {
@@ -391,7 +436,7 @@ pumpkin_block = Block(24, ['textures/block/pumpkin_top.png']*2+['textures/block/
 sunflower_block = Block(25, ['textures/block/sunflower_top.png', 'textures/block/sunflower_bottom.png', 'textures/block/sunflower_front.png', 'textures/block/sunflower_front.png', 'textures/block/sunflower_front.png', 'textures/block/sunflower_back.png']) #TODO: solve heavy mystery
 
 
-potato_stage0_block = potato_block = Plant(26, ['textures/block/potatoes_stage0.png']*6)
+potato_stage0_block = potato_block = Plant(*PLANTS['potato_stage0_block']) # Plant(26, ['textures/block/potatoes_stage0.png']*6)
 # potato_block = Plant(26, ['textures/block/potatoes_stage0.png']*6)
 carrot_stage0_block = carrot_block = Plant(27, ['textures/block/carrots_stage0.png']*6)
 rose_bush_bottom_block = rose_block = Plant(27, ['textures/block/rose_bush_bottom.png']*6)
@@ -418,3 +463,15 @@ jungleleaf_block = Block(42, ['textures/block/jungle_leaves.png']*6,  transparen
 birchwood_block = Block(43, ['textures/block/birch_log_top.png']*2+['textures/block/birch_log.png']*4)
 birchleaf_block = Block(44, ['textures/block/birch_leaves.png']*6,  transparent=True, colors=[(0, 124/255, 0, 1)]*6)
 yflowers_block = Plant(45, ['textures/block/dandelion.png']*6)
+yellow_wool = Block(46, ['textures/block/yellow_wool.png']*6)
+yellow_terracotta = Block(47, ['textures/block/yellow_terracotta.png']*6)
+# smithing_table = Block(48, ['textures/block/smithing_table_top.png', 'textures/block/smithing_table_bottom.png'] +['textures/block/smithing_table_side.png']*3 + ['textures/block/smithing_table_front.png'])
+# white_terracotta = Block(49, ['textures/block/white_terracotta.png']*6)
+# stripped_acacia_log = Block(50, ['textures/block/stripped_acacia_log_top.png']* 2 +['textures/block/stripped_acacia_log.png']*4)
+# basalt = Block(51, ['textures/block/basalt_top.png']*2 + ['textures/block/basalt_side.png']*4)
+# beacon = Block(52, ['textures/block/beacon.png']*6)
+# ancient_debris = Block(53, ['textures/block/ancient_debris_top.png']*2 + ['textures/block/ancient_debris_side.png']*4)
+# anvil = Block(54, ['textures/block/anvil_top.png'] + ['textures/block/anvil.png']*5)
+# bell = Block(55, ['textures/block/bell_top.png', 'textures/block/bell_bottom.png'] + ['textures/block/bell_side.png']*4)
+
+#RHishabh which all blocks u changed?
