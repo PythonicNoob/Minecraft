@@ -5,6 +5,7 @@ import sys
 import math
 import random
 import time
+import threading
 import pickle
 
 from collections import deque
@@ -22,6 +23,8 @@ from blocks import Plant, Liquid, Block
 
 from terrain import TerrainGeneratorSimple, TerrainGenerator
 from nature import Trunk, Tree, SmallPlant
+
+import glooey
 
 # import threading
 
@@ -660,7 +663,7 @@ class Model(object):
                     if dx ** 2 + dy ** 2 + dz ** 2 > (pad + 1) ** 2:
                         continue
                     if -instant_loads <= dx <= instant_loads and -instant_loads <= dz <= instant_loads and dy==0:
-                        print("dx:", dx,"dy:", dy,"dz:",dz)
+                        #print("dx:", dx,"dy:", dy,"dz:",dz)
                         # if before:
                         #     x, y, z = before
                         #     before_set_instant.add((x + dx, y + dy, z + dz))
@@ -768,6 +771,8 @@ class Window(pyglet.window.Window):
         self.reticle = None
 
         # hotbar
+        self.hotbar_image = pyglet.image.load('hotbar.png')
+        self.hotbar_image.anchor_x = self.hotbar_image.width // 2
         self.hotbar = None
 
         # Velocity in the y (upward) direction.
@@ -1101,15 +1106,31 @@ class Window(pyglet.window.Window):
         if self.reticle:
             self.reticle.delete()
 
-        if self.hotbar:
-            self.hotbar.update(x=self.width // 2, scale_x=(self.width * 0.4) // self.hotbar.width,
-                               scale_y=(self.height * 0.04) // self.hotbar.height)
-
         x, y = self.width // 2, self.height // 2
         n = 10
         self.reticle = pyglet.graphics.vertex_list(4,
-            ('v2i', (x - n, y, x + n, y, x, y - n, x, y + n))
-        )
+                                                   ('v2i', (x - n, y, x + n, y, x, y - n, x, y + n))
+                                                   )
+        if self.hotbar:
+            self.hotbar.delete()
+                # update(x=self.hotbar.width, scale_x=(self.width * 0.4) // self.hotbar.width,
+                #                scale_y=(self.height * 0.08) // self.hotbar.height)
+        self.hotbar = pyglet.sprite.Sprite(self.hotbar_image, x=x, y=0)
+        if self.width <= 800 and self.height <= 720 :
+            # wdth = self.width
+            self.hotbar.update(scale_x=(self.width * 0.6) // self.hotbar.width,
+                               scale_y=(self.height * 0.08) // self.hotbar.height)  # *0% width and 10% height
+        elif self.height > 720:
+            self.hotbar.update(scale_x=(self.width * 0.4) // self.hotbar.width,
+                               scale_y=(self.height * 0.08) // self.hotbar.height)
+        elif self.height > 920:
+            self.hotbar.update(scale_x=(self.width * 0.6) // self.hotbar.width,
+                               scale_y=(self.height * 0.08) // self.hotbar.height)  # *0% width and 10% height
+        else:
+            self.hotbar.update(scale_x=(800 * 0.6) // self.hotbar.width,
+                               scale_y=(self.height * 0.08) // self.hotbar.height)
+
+
 
     def set_2d(self):
         """ Configure OpenGL to draw in 2d.
@@ -1123,6 +1144,8 @@ class Window(pyglet.window.Window):
         glOrtho(0, max(1, width), 0, max(1, height), -1, 1)
         glMatrixMode(GL_MODELVIEW)
         glLoadIdentity()
+
+
 
     def set_3d(self):
         """ Configure OpenGL to draw in 3d.
@@ -1177,6 +1200,9 @@ class Window(pyglet.window.Window):
         self.set_2d()
         self.draw_label()
         self.draw_reticle()
+        # Experimental
+        glEnable(GL_TEXTURE_2D)
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST)
         self.draw_inventory()
 
     def draw_focused_block(self):
@@ -1197,9 +1223,9 @@ class Window(pyglet.window.Window):
         """ Draw the label in the top left of the screen.
         """
         x, y, z = self.position
-        self.label.text = '%02d (%.2f, %.2f, %.2f) %d / %d' % (
+        self.label.text = '%02d (%.2f, %.2f, %.2f) %d / %d %d %d' % (
             pyglet.clock.get_fps(), x, y, z,
-            len(self.model._shown), len(self.model.world))
+            len(self.model._shown), len(self.model.world), self.get_size()[0], self.get_size()[1])
         self.label.draw()
 
     def draw_reticle(self):
@@ -1209,12 +1235,10 @@ class Window(pyglet.window.Window):
         self.reticle.draw(GL_LINES)
 
     def draw_inventory(self):
-        hotbar_image = pyglet.image.load('hotbar.png')
-        hotbar_image.anchor_x = hotbar_image.width // 2
+
         # hotbar_image.anchor_y = hotbar_image.height
-        self.hotbar = pyglet.sprite.Sprite(hotbar_image, x=self.width // 2, y=0)
-        self.hotbar.update(scale_x=(self.width * 0.6) // self.hotbar.width,
-                           scale_y=(self.height * 0.06) // self.hotbar.height)  # *0% width and 10% height
+
+        glColor3d(1,1,1)
         self.hotbar.draw()
 
 
@@ -1258,7 +1282,7 @@ def setup():
 
 
 def main():
-    window = Window(width=800, height=600, caption='Pyglet', resizable=True)
+    window = Window(width=1366, height=768, caption='Pyglet', resizable=True, fullscreen=True)
     # Hide the mouse cursor and prevent the mouse from leaving the window.
     window.set_exclusive_mouse(True)
     setup()
