@@ -342,19 +342,6 @@ class Cactus(Block):
 
         return shown
 
-# TOP, BOTTOM, LEFT, RIGHT, FRONT, BACK.
-
-#There you go. No errors. thx. wait.
-#lets update the project first
-#Then lesser errors
-#ok?ok
-#Wait let me push the update first
-
-
-#Instructions:
-#Ctrl+T or Update Project
-#Then merge option -> Ok
-
 BLOCKS = {
     'stone_block':( 'pinecraft:stone_block', ['textures/block/stone.png'] * 6),
     'birchleaf_block':('pinecraft:birchleaf_block', ['textures/block/birch_leaves.png']*6),
@@ -506,5 +493,12 @@ dark_prismarine = Block(*BLOCKS['dark_prismarine'])
 
 
 
+oakwood_block = Block(39, ['textures/block/oak_log_top.png']*2+['textures/block/oak_log.png']*4)
+oakleaf_block = Block(40, ['textures/block/oak_leaves.png']*6,  transparent=True, colors=[(0, 124/255, 0, 1)]*6)
 
+junglewood_block = Block(41, ['textures/block/jungle_log_top.png']*2+['textures/block/jungle_log.png']*4)
+jungleleaf_block = Block(42, ['textures/block/jungle_leaves.png']*6,  transparent=True, colors=[(0, 124/255, 0, 1)]*6)
 
+birchwood_block = Block(43, ['textures/block/birch_log_top.png']*2+['textures/block/birch_log.png']*4)
+birchleaf_block = Block(44, ['textures/block/birch_leaves.png']*6,  transparent=True, colors=[(0, 124/255, 0, 1)]*6)
+yflowers_block = Plant(45, ['textures/block/dandelion.png']*6)

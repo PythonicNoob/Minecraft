@@ -24,7 +24,8 @@ from blocks import Plant, Liquid, Block
 from terrain import TerrainGeneratorSimple, TerrainGenerator
 from nature import Trunk, Tree, SmallPlant
 
-# import glooey
+from hotbar import Hotbar
+import glooey
 
 # import threading
 
@@ -771,24 +772,32 @@ class Window(pyglet.window.Window):
         self.reticle = None
 
         # hotbar
-        self.hotbar_image = pyglet.image.load('hotbar.png')
-        self.hotbar_image.anchor_x = self.hotbar_image.width // 2
-        self.hotbar = None
+        # self.hotbar_image = pyglet.image.load('hotbar.png')
+        # self.hotbar_image.anchor_x = self.hotbar_image.width // 2
+        # self.hotbar_selection_image = pyglet.image.load('hotbar_selection.png')
+        # self.hotbar_selection_image.anchor_x = self.hotbar_selection.width // 2
+        # self.hotbar_selection_image.anchor_y = self.hotbar_selection.height // 2
+        # self.hotbar = None
+        # self.hotbar_selection = None
+
+
 
         # Velocity in the y (upward) direction.
         self.dy = -10
 
         # A list of blocks the player can place. Hit num keys to cycle.
         # self.inventory = [BRICK, GRASS, SAND]
-        self.inventory = [brick_block, grass_block, sand_block, stone_block, acacia_leaves_block, acacia_sapling_block, blue_concrete_powder_block, water_block, cyan_stained_glass]
+        self.inventory = [brick_block, grass_block, sand_block, stone_block, acacia_leaves_block, acacia_sapling_block, blue_concrete_powder_block, water_block, yflowers_block]
+
+        self.hotbar = Hotbar(self.inventory)
 
         # The current block the user can place. Hit num keys to cycle.
-        self.block = self.inventory[0]
+        # self.block = self.inventory[0]
 
         # Convenience list of num keys.
         self.num_keys = [
             key._1, key._2, key._3, key._4, key._5,
-            key._6, key._7, key._8, key._9, key._0]
+            key._6, key._7, key._8, key._9,] # key._0]
 
         # Instance of the model that handles the world.
         self.model = Model()
@@ -986,18 +995,19 @@ class Window(pyglet.window.Window):
 
             # if '*' in self.model.placeable_on
 
+            this_block = self.hotbar.current_block
 
             if self.model.world.get((x, y, z), None):
 
-                if self.model.world[x, y, z] not in self.block.placeable_on and '*' not in self.block.placeable_on:
+                if self.model.world[x, y, z] not in this_block.placeable_on and '*' not in this_block.placeable_on:
                     return
 
-                if self.model.world[x,y,z] == grass_block and isinstance(self.block, Plant) == False:
+                if self.model.world[x,y,z] == grass_block and isinstance(this_block, Plant) == False:
                     self.model.remove_block((x, y, z), immediate=True)
                     self.model.add_block_new((x, y, z), dirt_block, immediate=True)
 
-            self.model.add_block_new(previous, self.block)
-            self.block.on_place(previous, self.model)
+            self.model.add_block_new(previous, this_block)
+            this_block.on_place(previous, self.model)
 
     def on_mouse_press(self, x, y, button, modifiers):
         """ Called when a mouse button is pressed. See pyglet docs for button
@@ -1075,8 +1085,10 @@ class Window(pyglet.window.Window):
         elif symbol == key.TAB:
             self.flying = not self.flying
         elif symbol in self.num_keys:
-            index = (symbol - self.num_keys[0]) % len(self.inventory)
-            self.block = self.inventory[index]
+            index = (symbol - self.num_keys[0]) % self.hotbar.hotbar_size
+            self.hotbar.index = index
+            # self.block = self.hotbar.current_block #self.inventory[index]
+            # self.hotbar_index = index
 
     def on_key_release(self, symbol, modifiers):
         """ Called when the player releases a key. See pyglet docs for key
@@ -1111,24 +1123,33 @@ class Window(pyglet.window.Window):
         self.reticle = pyglet.graphics.vertex_list(4,
                                                    ('v2i', (x - n, y, x + n, y, x, y - n, x, y + n))
                                                    )
-        if self.hotbar:
-            self.hotbar.delete()
-                # update(x=self.hotbar.width, scale_x=(self.width * 0.4) // self.hotbar.width,
-                #                scale_y=(self.height * 0.08) // self.hotbar.height)
-        self.hotbar = pyglet.sprite.Sprite(self.hotbar_image, x=x, y=0)
-        if self.width <= 800 and self.height <= 720 :
-            # wdth = self.width
-            self.hotbar.update(scale_x=(self.width * 0.6) // self.hotbar.width,
-                               scale_y=(self.height * 0.08) // self.hotbar.height)  # *0% width and 10% height
-        elif self.height > 720:
-            self.hotbar.update(scale_x=(self.width * 0.4) // self.hotbar.width,
-                               scale_y=(self.height * 0.08) // self.hotbar.height)
-        elif self.height > 920:
-            self.hotbar.update(scale_x=(self.width * 0.6) // self.hotbar.width,
-                               scale_y=(self.height * 0.08) // self.hotbar.height)  # *0% width and 10% height
-        else:
-            self.hotbar.update(scale_x=(800 * 0.6) // self.hotbar.width,
-                               scale_y=(self.height * 0.08) // self.hotbar.height)
+
+        self.hotbar.resize(width, height)
+
+        # if self.hotbar:
+        #     self.hotbar.delete()
+        #         # update(x=self.hotbar.width, scale_x=(self.width * 0.4) // self.hotbar.width,
+        #         #                scale_y=(self.height * 0.08) // self.hotbar.height)
+        # self.hotbar = pyglet.sprite.Sprite(self.hotbar_image, x=x, y=0)
+
+        # if self.hotbar_selection:
+        #     self.hotbar_selection.delete()
+
+        # self.hotbar_selection = pyglet.sprite.Sprite(self.hotbar_selection_image, x=s)
+
+        # if self.width <= 800 and self.height <= 720 :
+        #     # wdth = self.width
+        #     self.hotbar.update(scale_x=(self.width * 0.6) // self.hotbar.width,
+        #                        scale_y=(self.height * 0.08) // self.hotbar.height)  # *0% width and 10% height
+        # elif self.height > 720:
+        #     self.hotbar.update(scale_x=(self.width * 0.4) // self.hotbar.width,
+        #                        scale_y=(self.height * 0.08) // self.hotbar.height)
+        # elif self.height > 920:
+        #     self.hotbar.update(scale_x=(self.width * 0.6) // self.hotbar.width,
+        #                        scale_y=(self.height * 0.08) // self.hotbar.height)  # *0% width and 10% height
+        # else:
+        #     self.hotbar.update(scale_x=(800 * 0.6) // self.hotbar.width,
+        #                        scale_y=(self.height * 0.08) // self.hotbar.height)
 
 
 
@@ -1201,9 +1222,8 @@ class Window(pyglet.window.Window):
         self.draw_label()
         self.draw_reticle()
         # Experimental
-        glEnable(GL_TEXTURE_2D)
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST)
-        self.draw_inventory()
+
+        self.hotbar.draw()
 
     def draw_focused_block(self):
         """ Draw black edges around the block that is currently under the
