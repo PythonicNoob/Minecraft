@@ -1,6 +1,8 @@
 from pyglet import image
 from pyglet.gl import *
 from pyglet.graphics import TextureGroup
+import threading
+import time
 import pyglet
 # import numpy as np
 
@@ -67,13 +69,19 @@ def grass_verts(pos,n=0.5):
 def cube_vertices_with_sides(x, y, z, n=0.5):
     """ Return the vertices of the cube at position x, y, z with size 2*n.
     """
+    v1x = x + n
+    v2x = x - n
+    v1y = y + n
+    v2y = y - n
+    v1z = z + n
+    v2z = z - n
     return [
-        [x-n,y+n,z-n, x-n,y+n,z+n, x+n,y+n,z+n, x+n,y+n,z-n],  # top
-        [x-n,y-n,z-n, x+n,y-n,z-n, x+n,y-n,z+n, x-n,y-n,z+n],  # bottom
-        [x-n,y-n,z-n, x-n,y-n,z+n, x-n,y+n,z+n, x-n,y+n,z-n],  # left
-        [x+n,y-n,z+n, x+n,y-n,z-n, x+n,y+n,z-n, x+n,y+n,z+n],  # right
-        [x-n,y-n,z+n, x+n,y-n,z+n, x+n,y+n,z+n, x-n,y+n,z+n],  # front
-        [x+n,y-n,z-n, x-n,y-n,z-n, x-n,y+n,z-n, x+n,y+n,z-n],  # back
+        [v2x, v1y, v2z, v2x, v1y, v1z, v1x, v1y, v1z, v1x, v1y, v2z],  # top
+        [v2x, v2y, v2z, v1x, v2y, v2z, v1x, v2y, v1z, v2x, v2y, v1z],  # bottom
+        [v2x, v2y, v2z, v2x, v2y, v1z, v2x, v1y, v1z, v2x, v1y, v2z],  # left
+        [v1x, v2y, v1z, v1x, v2y, v2z, v1x, v1y, v2z, v1x, v1y, v1z],  # right
+        [v2x, v2y, v1z, v1x, v2y, v1z, v1x, v1y, v1z, v2x, v1y, v1z],  # front
+        [x+n, y-n, z-n, x-n, y-n, z-n, x-n, y+n, z-n, x+n, y+n, z-n],  # back
     ]
 
 def cactus_cube_vertices_with_sides(x, y, z, n=0.5, value_reduction=(2,16), extra = 0):

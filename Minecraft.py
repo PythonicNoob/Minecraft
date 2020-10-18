@@ -5,6 +5,7 @@ import sys
 import math
 import random
 import time
+import threading
 import pickle
 
 from collections import deque
@@ -662,7 +663,7 @@ class Model(object):
                     if dx ** 2 + dy ** 2 + dz ** 2 > (pad + 1) ** 2:
                         continue
                     if -instant_loads <= dx <= instant_loads and -instant_loads <= dz <= instant_loads and dy==0:
-                        print("dx:", dx,"dy:", dy,"dz:",dz)
+                        #print("dx:", dx,"dy:", dy,"dz:",dz)
                         # if before:
                         #     x, y, z = before
                         #     before_set_instant.add((x + dx, y + dy, z + dz))
@@ -1281,7 +1282,7 @@ def setup():
 
 
 def main():
-    window = Window(width=800, height=600, caption='Pyglet', resizable=True)
+    window = Window(width=1366, height=768, caption='Pyglet', resizable=True, fullscreen=True)
     # Hide the mouse cursor and prevent the mouse from leaving the window.
     window.set_exclusive_mouse(True)
     setup()
