@@ -7,7 +7,7 @@ import pyglet
 # import numpy as np
 
 __all__ = (
-    'stone_block', 'sand_block', 'brick_block', 'bedrock_block', 'acacia_leaves_block', 'acacia_sapling_block','blue_concrete_powder_block', 'grass_block', 'water_block', 'dirt_block', 'snow_block', 'diamondore_block', 'coalore_block', 'gravel_block','ironore_block','lapisore_block', 'quartz_block','clay_block','nether_block','nether_quartz_ore_block' ,'soulsand_block', 'sandstone_block', 'ice_block', 'snowgrass_block', 'air_block', 'melon_block','pumpkin_block', 'yflowers_block', 'potato_block', 'carrot_block', 'rose_block', 'fern_block', 'wildgrass0_block','wildgrass1_block', 'wildgrass0_block', 'wildgrass2_block', 'wildgrass3_block', 'wildgrass4_block', 'wildgrass5_block','wildgrass6_block','wildgrass7_block', 'deadbush_block', 'cactus_block', 'tallcactus_block','reed_block','oakwood_block','oakleaf_block','junglewood_block','jungleleaf_block','birchwood_block','birchleaf_block')
+    'stone_block', 'sand_block', 'brick_block', 'bedrock_block', 'acacia_leaves_block', 'acacia_sapling_block','blue_concrete_powder_block', 'grass_block', 'water_block', 'dirt_block', 'snow_block', 'diamondore_block', 'coalore_block', 'gravel_block','ironore_block','lapisore_block', 'quartz_block','clay_block','nether_block','nether_quartz_ore_block' ,'soulsand_block', 'sandstone_block', 'ice_block', 'snowgrass_block', 'air_block', 'melon_block','pumpkin_block', 'yflowers_block', 'potato_block', 'carrot_block', 'rose_block', 'fern_block', 'wildgrass0_block','wildgrass1_block', 'wildgrass0_block', 'wildgrass2_block', 'wildgrass3_block', 'wildgrass4_block', 'wildgrass5_block','wildgrass6_block','wildgrass7_block', 'deadbush_block', 'cactus_block', 'tallcactus_block','reed_block','oakwood_block','oakleaf_block','junglewood_block','jungleleaf_block','birchwood_block','birchleaf_block', 'potato_stage0_block', 'bell', 'beacon', 'ancient_debris', 'blackstone', 'cartography_table', 'crying_obsidian', 'cyan_stained_glass')
 
 def grass_on_place(pos, model):
     x, y, z = pos
@@ -374,6 +374,17 @@ BLOCKS = {
     'ancient_debris':('pinecraft:ancient_debris', ['textures/block/ancient_debris_top.png']*2 + ['textures/block/ancient_debris_side.png']*4),
     'anvil':('pinecraft:anvil', ['textures/block/anvil_top.png'] + ['textures/block/anvil.png']*5),
     'bell':('pinecraft:bell', ['textures/block/bell_top.png', 'textures/block/bell_bottom.png'] + ['textures/block/bell_side.png']*4),
+    'black_concrete':('pinecraft:black_concrete', ['textures/block/black_concrete.png']*6),
+    'blackstone':('pinecraft:blackstone', ['textures/block/blackstone_top.png']*2 +['textures/block/blackstone.png']*4),
+    'bone_block':('pinecraft:bone_block', ['textures/block/bone_block_top.png']*2 +['textures/block/bone_block_side.png']*4),
+    'bookshelf':('pinecraft:bookshelf', ['textures/block/oak_planks.png']*2 +['textures/block/bookshelf.png']*4),
+    'cartography_table':('pinecraft:cartography_table', ['textures/block/cartography_table_top.png', 'textures/block/dark_oak_planks.png']+ ['textures/block/cartography_table_side1.png']*2+ ['textures/block/cartography_table_side2.png', 'textures/block/cartography_table_side3.png']),
+    'crafting_table':('pinecraft:crafting_table', ['textures/block/crafting_table_front.png', 'textures/block/oak_planks.png']+ ['textures/block/crafting_table_front.png']+['textures/block/crafting_table_side.png']*3),
+    'crying_obsidian':('pinecraft:crying_obsidian', ['textures/block/crying_obsidian.png']*6),
+    'cyan_concrete':('pinecraft:cyan_concrete', ['textures/block/cyan_concrete.png']*6),
+    'cyan_stained_glass':('pinecraft:cyan_stained_glass', ['textures/block/cyan_stained_glass.png']*6),
+    'dark_prismarine':('pinecraft:dark_prismarine', ['textures/block/dark_prismarine.png']*6),
+
 
 
 
@@ -444,12 +455,11 @@ pumpkin_block = Block(24, ['textures/block/pumpkin_top.png']*2+['textures/block/
 sunflower_block = Block(25, ['textures/block/sunflower_top.png', 'textures/block/sunflower_bottom.png', 'textures/block/sunflower_front.png', 'textures/block/sunflower_front.png', 'textures/block/sunflower_front.png', 'textures/block/sunflower_back.png']) #TODO: solve heavy mystery
 
 
-potato_stage0_block = potato_block = Plant(*PLANTS['potato_stage0_block']) # Plant(26, ['textures/block/potatoes_stage0.png']*6)
-# potato_block = Plant(26, ['textures/block/potatoes_stage0.png']*6)
-carrot_stage0_block = carrot_block = Plant(27, ['textures/block/carrots_stage0.png']*6)
-rose_bush_bottom_block = rose_block = Plant(27, ['textures/block/rose_bush_bottom.png']*6)
-fern_block = Plant(28, ['textures/block/fern.png']*6, colors=[(0, 124/255, 0, 1)]*6) #TODO: fern add color
-tall_grass_top_block = wildgrass0_block = Plant(29, ['textures/block/tall_grass_top.png']*6, colors=[(	0, 124/255, 0, 1)]*6)
+potato_stage0_block = potato_block = Plant(*PLANTS['potato_stage0_block'])
+carrot_stage0_block = carrot_block = Plant(*PLANTS['carrot_stage0_block'])
+rose_bush_bottom_block = rose_block = Plant(*PLANTS['rose_bush_bottom_block'])
+fern_block = Plant(*PLANTS['fern_block'], colors=[(0, 124/255, 0, 1)]*6) #TODO: fern add color
+tall_grass_top_block = wildgrass0_block = Plant(*PLANTS['wild_grass'], colors=[(	0, 124/255, 0, 1)]*6)
 wildgrass1_block = Plant(*PLANTS["wild_grass"], colors=[(	0, 124/255, 0, 1)]*6)
 wildgrass2_block = Plant(30, ['textures/block/tall_grass_top.png']*6, colors=[(	0, 124/255, 0, 1)]*6)
 wildgrass3_block = Plant(31, ['textures/block/tall_grass_top.png']*6, colors=[(	0, 124/255, 0, 1)]*6)
@@ -457,29 +467,44 @@ wildgrass4_block = Plant(32, ['textures/block/tall_grass_top.png']*6, colors=[(	
 wildgrass5_block = Plant(33, ['textures/block/tall_grass_top.png']*6, colors=[(	0, 124/255, 0, 1)]*6)
 wildgrass6_block = Plant(34, ['textures/block/tall_grass_top.png']*6, colors=[(	0, 124/255, 0, 1)]*6)
 wildgrass7_block = Plant(35, ['textures/block/tall_grass_top.png']*6, colors=[(	0, 124/255, 0, 1)]*6)
-deadbush_block = Plant(36, ['textures/block/dead_bush.png']*6)
-cactus_block = Cactus(37, ['textures/block/cactus_top.png','textures/block/cactus_bottom.png']+['textures/block/cactus_side.png']*4, transparent=True)
+deadbush_block = Plant(*PLANTS['deadbush_block'])
+cactus_block = Cactus(*PLANTS['cactus_block'], transparent=True)
 tallcactus_block = cactus_block
-reed_block = sugarcane_block = Plant(38, ['textures/block/sugar_cane.png']*6)
+reed_block = sugarcane_block = Plant(*PLANTS['sugarcane_block'])
 
-oakwood_block = Block(39, ['textures/block/oak_log_top.png']*2+['textures/block/oak_log.png']*4)
-oakleaf_block = Block(40, ['textures/block/oak_leaves.png']*6,  transparent=True, colors=[(0, 124/255, 0, 1)]*6)
+oakwood_block = Block(*BLOCKS['oakwood_block'])
+oakleaf_block = Block(*BLOCKS['oakleaf_block'],  transparent=True, colors=[(0, 124/255, 0, 1)]*6)
 
-junglewood_block = Block(41, ['textures/block/jungle_log_top.png']*2+['textures/block/jungle_log.png']*4)
-jungleleaf_block = Block(42, ['textures/block/jungle_leaves.png']*6,  transparent=True, colors=[(0, 124/255, 0, 1)]*6)
+junglewood_block = Block(*BLOCKS['junglewood_block'])
+jungleleaf_block = Block(*BLOCKS['jungleleaf_block'],  transparent=True, colors=[(0, 124/255, 0, 1)]*6)
 
-birchwood_block = Block(43, ['textures/block/birch_log_top.png']*2+['textures/block/birch_log.png']*4)
-birchleaf_block = Block(44, ['textures/block/birch_leaves.png']*6,  transparent=True, colors=[(0, 124/255, 0, 1)]*6)
-yflowers_block = Plant(45, ['textures/block/dandelion.png']*6)
-yellow_wool = Block(46, ['textures/block/yellow_wool.png']*6)
-yellow_terracotta = Block(47, ['textures/block/yellow_terracotta.png']*6)
-# smithing_table = Block(48, ['textures/block/smithing_table_top.png', 'textures/block/smithing_table_bottom.png'] +['textures/block/smithing_table_side.png']*3 + ['textures/block/smithing_table_front.png'])
-# white_terracotta = Block(49, ['textures/block/white_terracotta.png']*6)
-# stripped_acacia_log = Block(50, ['textures/block/stripped_acacia_log_top.png']* 2 +['textures/block/stripped_acacia_log.png']*4)
-# basalt = Block(51, ['textures/block/basalt_top.png']*2 + ['textures/block/basalt_side.png']*4)
-# beacon = Block(52, ['textures/block/beacon.png']*6)
-# ancient_debris = Block(53, ['textures/block/ancient_debris_top.png']*2 + ['textures/block/ancient_debris_side.png']*4)
-# anvil = Block(54, ['textures/block/anvil_top.png'] + ['textures/block/anvil.png']*5)
-# bell = Block(55, ['textures/block/bell_top.png', 'textures/block/bell_bottom.png'] + ['textures/block/bell_side.png']*4)
+birchwood_block = Block(*BLOCKS['birchwood_block'])
+birchleaf_block = Block(*BLOCKS['birchleaf_block'],  transparent=True, colors=[(0, 124/255, 0, 1)]*6)
+yflowers_block = Plant(*BLOCKS['yflower_block'])
+yellow_wool = Block(*BLOCKS['yellow_wool'])
+yellow_terracotta = Block(*BLOCKS['yellow_terracotta'])
+smithing_table = Block(*BLOCKS['smithing_table'])
+white_terracotta = Block(*BLOCKS['white_terracotta'])
+stripped_acacia_log = Block(*BLOCKS['stripped_acacia_log'])
+basalt = Block(*BLOCKS['basalt'])
+beacon = Block(*BLOCKS['beacon'])
+ancient_debris = Block(*BLOCKS['ancient_debris'])
+anvil = Block(*BLOCKS['anvil'])
+bell = Block(*BLOCKS['bell'])
+black_concrete = Block(*BLOCKS['black_concrete'])
+blackstone = Block(*BLOCKS['blackstone'])
+bone_block = Block(*BLOCKS['bone_block'])
+bookshelf = Block(*BLOCKS['bookshelf'])
+cartography_table = Block(*BLOCKS['cartography_table'])
+crafting_table = Block(*BLOCKS['crafting_table'])
+crying_obsidian = Block(*BLOCKS['crying_obsidian'])
+cyan_concrete = Block(*BLOCKS['cyan_concrete'])
+cyan_stained_glass = Block(*BLOCKS['cyan_stained_glass'], transparent=False)
+dark_prismarine = Block(*BLOCKS['dark_prismarine'])
 
-#RHishabh which all blocks u changed?
+
+
+
+
+
+

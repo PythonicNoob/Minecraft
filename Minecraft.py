@@ -24,7 +24,7 @@ from blocks import Plant, Liquid, Block
 from terrain import TerrainGeneratorSimple, TerrainGenerator
 from nature import Trunk, Tree, SmallPlant
 
-import glooey
+# import glooey
 
 # import threading
 
@@ -780,7 +780,7 @@ class Window(pyglet.window.Window):
 
         # A list of blocks the player can place. Hit num keys to cycle.
         # self.inventory = [BRICK, GRASS, SAND]
-        self.inventory = [brick_block, grass_block, sand_block, stone_block, acacia_leaves_block, acacia_sapling_block, blue_concrete_powder_block, water_block, yflowers_block]
+        self.inventory = [brick_block, grass_block, sand_block, stone_block, acacia_leaves_block, acacia_sapling_block, blue_concrete_powder_block, water_block, cyan_stained_glass]
 
         # The current block the user can place. Hit num keys to cycle.
         self.block = self.inventory[0]
@@ -1282,7 +1282,7 @@ def setup():
 
 
 def main():
-    window = Window(width=1366, height=768, caption='Pyglet', resizable=True, fullscreen=True)
+    window = Window(width=800, height=600, caption='Pyglet', resizable=True, fullscreen=False)
     # Hide the mouse cursor and prevent the mouse from leaving the window.
     window.set_exclusive_mouse(True)
     setup()
