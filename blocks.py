@@ -7,7 +7,7 @@ import pyglet
 # import numpy as np
 
 __all__ = (
-    'stone_block', 'sand_block', 'brick_block', 'bedrock_block', 'acacia_leaves_block', 'acacia_sapling_block','blue_concrete_powder_block', 'grass_block', 'water_block', 'dirt_block', 'snow_block', 'diamondore_block', 'coalore_block', 'gravel_block','ironore_block','lapisore_block', 'quartz_block','clay_block','nether_block','nether_quartz_ore_block' ,'soulsand_block', 'sandstone_block', 'ice_block', 'snowgrass_block', 'air_block', 'melon_block','pumpkin_block', 'yflowers_block', 'potato_block', 'carrot_block', 'rose_block', 'fern_block', 'wildgrass0_block','wildgrass1_block', 'wildgrass0_block', 'wildgrass2_block', 'wildgrass3_block', 'wildgrass4_block', 'wildgrass5_block','wildgrass6_block','wildgrass7_block', 'deadbush_block', 'cactus_block', 'tallcactus_block','reed_block','oakwood_block','oakleaf_block','junglewood_block','jungleleaf_block','birchwood_block','birchleaf_block', 'potato_stage0_block', 'bell', 'beacon', 'ancient_debris', 'blackstone', 'cartography_table', 'crying_obsidian', 'cyan_stained_glass')
+    'stone_block', 'sand_block', 'brick_block', 'bedrock_block', 'acacia_leaves_block', 'acacia_sapling_block','blue_concrete_powder_block', 'grass_block', 'water_block', 'dirt_block', 'snow_block', 'diamondore_block', 'coalore_block', 'gravel_block','ironore_block','lapisore_block', 'quartz_block','clay_block','nether_block','nether_quartz_ore_block' ,'soulsand_block', 'sandstone_block', 'ice_block', 'snowgrass_block', 'air_block', 'melon_block','pumpkin_block', 'yflowers_block', 'potato_block', 'carrot_block', 'rose_block', 'fern_block', 'wildgrass0_block','wildgrass1_block', 'wildgrass0_block', 'wildgrass2_block', 'wildgrass3_block', 'wildgrass4_block', 'wildgrass5_block','wildgrass6_block','wildgrass7_block', 'deadbush_block', 'cactus_block', 'tallcactus_block','reed_block','oakwood_block','oakleaf_block','junglewood_block','jungleleaf_block','birchwood_block','birchleaf_block', 'potato_stage0_block', 'bell', 'beacon', 'ancient_debris', 'blackstone', 'cartography_table', 'crying_obsidian', 'cyan_stained_glass', 'cobweb', 'observer_block')
 
 def grass_on_place(pos, model):
     x, y, z = pos
@@ -371,10 +371,48 @@ BLOCKS = {
     'cyan_concrete':('pinecraft:cyan_concrete', ['textures/block/cyan_concrete.png']*6),
     'cyan_stained_glass':('pinecraft:cyan_stained_glass', ['textures/block/cyan_stained_glass.png']*6),
     'dark_prismarine':('pinecraft:dark_prismarine', ['textures/block/dark_prismarine.png']*6),
-
-
-
-
+    'smooth_stone':('pinecraft:smooth_stone', ['textures/block/smooth_stone.png']*6),
+    'coarse_dirt':('pinecraft:coarse_dirt', ['textures/block/coarse_dirt.png']*6),
+    'cobblestone':('pinecraft:cobblestone', ['textures/block/cobblestone.png']*6),
+    'cobweb':('pinecraft:cobweb', ['textures/block/cobweb.png']*6),
+    'crimson_planks':('pinecraft:crimson_planks', ['textures/block/crimson_planks.png']*6),
+    'emerald_block':('pinecraft:emerald_block', ['textures/block/emerald_block.png']*6),
+    'end_stone':('pinecraft:end_stone', ['textures/block/end_stone.png']*6),
+    'granite':('pinecraft:granite', ['textures/block/granite.png']*6),
+    'hay_block':('pinecraft:hay_block', ['textures/block/hay_block_top.png']*2 +['textures/block/hay_block_side.png']*4),
+    'honey_block':('pinecraft:honey_block', ['textures/block/honey_block_top.png']*2+ ['textures/block/honey_block_side.png']*4),
+    'iron_block':('pinecraft:iron_block', ['textures/block/iron_block.png']*6),
+    'lapis_block':('pinecraft:lapis_block', ['textures/block/lapis_block.png']*6),
+    'observer_block':('pinecraft:observer', ['textures/block/observer_top.png']*2 +['textures/block/observer_side.png']*2 +['textures/block/observer_front.png', 'textures/block/observer_back.png']),
+    'pink_concrete':('pinecraft:pink_concrete', ['textures/block/pink_concrete.png']*6),
+    'pink_concrete_powder':('pinecraft:pink_concrete_powder', ['textures/block/pink_concrete_powder.png']*6),
+    'pink_wool':('pinecraft:pink_wool', ['textures/block/pink_wool.png']*6),
+    'polished_andesite':('pinecraft:polished_andesite', ['textures/block/polished_andesite.png']*6),
+    'polished_basalt':('pinecraft:polished_basalt', ['textures/block/polished_basalt_top.png']*2+ ['textures/block/polished_basalt_side.png']*4),
+    'podzol_block':('pinecraft:podzol', ['textures/block/podzol_top.png', 'textures/block/dirt.png']+['textures/block/podzol_side.png']*4),
+    'polished_diorite':('pinecraft:polished_diorite', ['textures/block/polished_diorite.png']*6),
+    'polished_granite':('pinecraft:polished_granite', ['textures/block/polished_granite.png']*6),
+    'purple_wool':('pinecraft:purple_wool', ['textures/block/purple_wool.png']*6),
+    'purpur_block':('pinecraft:purpur_block', ['textures/block/purpur_block.png']*6),
+    'purpur_pillar':('pinecraft:purpur_pillar', ['textures/block/purpur_pillar_top.png']*2+ ['textures/block/purpur_pillar.png']*4),
+    'red_mushroom':('pinecraft:red_mushroom_block', ['textures/block/red_mushroom_block.png']*6),
+    'red_nether_bricks':('pinecraft:red_nether_bricks', ['textures/block/red_nether_bricks.png']*6),
+    'red_sand':('pinecraft:red_sand', ['textures/block/red_sand.png']*6),
+    'red_sandstone':('pinecraft:red_sandstone', ['textures/block/red_sandstone_top.png', 'textures/block/red_sandstone_bottom.png']+['textures/block/red_sandstone.png']*4),
+    'red_wool':('pinecraft:red_wool', ['textures/block/red_wool.png']*6),
+    'sea_lantern':('pinecraft:sea_lantern', ['textures/block/sea_lantern.png']*6),
+    'shroomlight':('pinecraft:shroomlight', ['textures/block/shroomlight.png']*6),
+    'slime_block': ('pinecraft:slime_block', ['textures/block/slime_block.png']*6),
+    'sponge': ('pinecraft:sponge', ['textures/block/sponge.png']*6),
+    'stone_bricks': ('pinecraft:stone_bricks', ['textures/block/stone_bricks.png']*6),
+    'tnt':('pinecraft:tnt', ['textures/block/tnt_top.png', 'textures/block/tnt_bottom.png']+['textures/block/tnt_side.png']*4),
+    'warped_nylium':('pinecraft:warped_nylium', ['textures/block/warped_nylium.png', 'textures/block/netherrack.png']+ ['textures/block/warped_nylium_side.png']*4),
+    'warped_planks': ('pinecraft:warped_planks', ['textures/block/warped_planks.png']*6),
+    'mossy_cobblestone':('pinecraft:mossy_cobblestone', ['textures/block/mossy_cobblestone.png']*6),
+    'magenta_concrete':('pinecraft:magenta_concrete', ['textures/block/magenta_concrete.png']*6),
+    'magenta_wool':('pinecraft:magenta_wool', ['textures/block/magenta_wool.png']*6),
+    'lime_concrete':('pinecraft:lime_concrete', ['textures/block/lime_concrete.png']*6),
+    'lime_wool':('pinecraft:lime_wool', ['textures/block/lime_wool.png']*6),
 
 }
 
@@ -389,6 +427,8 @@ PLANTS = {
     "deadbush_block":("pinecraft:dead_bush", ['textures/block/dead_bush.png']*6),
     "cactus_block":("pinecraft:cactus", ['textures/block/cactus_top.png','textures/block/cactus_bottom.png']+['textures/block/cactus_side.png']*4),
     "sugarcane_block":("pinecraft:sugarcane", ['textures/block/sugar_cane.png']*6),
+
+
 
 
 }
@@ -488,6 +528,63 @@ crying_obsidian = Block(*BLOCKS['crying_obsidian'])
 cyan_concrete = Block(*BLOCKS['cyan_concrete'])
 cyan_stained_glass = Block(*BLOCKS['cyan_stained_glass'], transparent=False)
 dark_prismarine = Block(*BLOCKS['dark_prismarine'])
+smooth_stone = Block(*BLOCKS['smooth_stone'])
+coarse_dirt = Block(*BLOCKS['coarse_dirt'])
+cobblestone = Block(*BLOCKS['cobblestone'])
+cobweb = Block(*BLOCKS['cobweb'], transparent=True, rigid=False)
+crimson_planks = Block(*BLOCKS['crimson_planks'])
+emerald_block = Block(*BLOCKS['emerald_block'])
+end_stone = Block(*BLOCKS['end_stone'])
+granite = Block(*BLOCKS['granite'])
+hay_block = Block(*BLOCKS['hay_block'])
+honey_block = Block(*BLOCKS['honey_block'])
+iron_block = Block(*BLOCKS['iron_block'])
+lapis_block = Block(*BLOCKS['lapis_block']) #30
+observer_block = Block(*BLOCKS['observer_block'])
+pink_concrete = Block(*BLOCKS['pink_concrete'])
+pink_concrete_powder = Block(*BLOCKS['pink_concrete_powder'])
+pink_wool = Block(*BLOCKS['pink_wool'])
+polished_andesite = Block(*BLOCKS['polished_andesite']) #35
+polished_basalt = Block(*BLOCKS['polished_basalt'])
+podzol_block = Block(*BLOCKS['podzol_block'])
+polished_granite = Block(*BLOCKS['polished_granite'])
+polished_diorite = Block(*BLOCKS['polished_diorite'])
+purple_wool = Block(*BLOCKS['purple_wool']) #40
+purpur_block = Block(*BLOCKS['purpur_block'])
+purpur_pillar_block = Block(*BLOCKS['purpur_pillar'])
+red_mushroom_block = Block(*BLOCKS['red_mushroom'])
+red_nether_bricks = Block(*BLOCKS['red_nether_bricks'])
+red_sand = Block(*BLOCKS['red_sand']) #45
+red_sandstone = Block(*BLOCKS['red_sandstone'])
+red_wool = Block(*BLOCKS['red_wool'])
+# sea_lantern = Block(*BLOCKS['sea_lantern'])
+shroomlight = Block(*BLOCKS['shroomlight'])
+slime_block = Block(*BLOCKS['slime_block']) #50
+sponge = Block(*BLOCKS['sponge'])
+stone_bricks = Block(*BLOCKS['stone_bricks'])
+tnt = Block(*BLOCKS['tnt'])
+warped_nylium = Block(*BLOCKS['warped_nylium'])
+warped_planks = Block(*BLOCKS['warped_planks'])#55
+mossy_cobblestone = Block(*BLOCKS['mossy_cobblestone'])
+magenta_concrete = Block(*BLOCKS['magenta_concrete'])
+magenta_wool = Block(*BLOCKS['magenta_wool'])
+lime_wool = Block(*BLOCKS['lime_wool'])
+lime_concrete = Block(*BLOCKS['lime_concrete'])#60
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
