@@ -5,6 +5,8 @@ import sys
 import math
 import random
 import time
+import os
+import psutil
 import threading
 import pickle
 
@@ -981,7 +983,8 @@ class Window(pyglet.window.Window):
         right_click_action = self.model.shown[click_pos].right_click_press()
         if right_click_action is not None:
             # Peform right click action, open chests, inventory, place water etc.
-            print("Performing action: ", right_click_action)
+            #print("Performing action: ", right_click_action)
+            pass
         else:
             # grass should turn to dirt.
             # Other conditions also can be added by checkking with blocks
@@ -1219,6 +1222,7 @@ class Window(pyglet.window.Window):
         self.draw_focused_block()
         self.set_2d()
         self.draw_label()
+        self.cpu_usage()
         self.draw_reticle()
         # Experimental
 
@@ -1237,6 +1241,17 @@ class Window(pyglet.window.Window):
             glPolygonMode(GL_FRONT_AND_BACK, GL_LINE)
             pyglet.graphics.draw(24, GL_QUADS, ('v3f/static', vertex_data))
             glPolygonMode(GL_FRONT_AND_BACK, GL_FILL)
+
+    def optimize():
+        pid = os.getpid()
+        p = psutil.Process(pid)
+        p.nice(psutil.HIGH_PRIORITY_CLASS)
+        p.ionice(psutil.IOPRIO_HIGH)
+    def cpu_usage(self):
+        c = psutil.cpu_percent(interval=0)
+        d = "CPU: "+str(c)+"%"
+        label=pyglet.text.Label(d,font_name="Arial", font_size=16,color=(0,0,0,255))
+        label.draw()
 
     def draw_label(self):
         """ Draw the label in the top left of the screen.
@@ -1259,6 +1274,11 @@ class Window(pyglet.window.Window):
 
         glColor3d(1,1,1)
         self.hotbar.draw()
+def optimize():
+    pid=os.getpid()
+    p = psutil.Process(pid)
+    p.nice(psutil.HIGH_PRIORITY_CLASS)
+    p.ionice(psutil.IOPRIO_HIGH)
 
 
 def setup_fog():
