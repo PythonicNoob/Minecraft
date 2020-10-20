@@ -178,12 +178,6 @@ class TerrainGenerator(TerrainGeneratorBase):
 
                     first_block = -1
         return c
-
-    def gen_inner_layer(self, x, y, z, c):
-        # Mineral generation should be here also
-        c.set_block(x, y, z, stone_block)
-        return c
-
     def gen_outer_layer(self, x, y, z, first_block, c, biome_type):
 
         depth = int(first_block - y)
@@ -193,7 +187,7 @@ class TerrainGenerator(TerrainGeneratorBase):
                 c.set_block(x, y, z, sand_block)
             elif depth == 0 and 32 < y < 128:
                 c.set_block(x, y, z, grass_block)
-            elif depth > 32: 
+            elif depth > 32:
                 c.set_block(x, y, z, stone_block)
             else:
                 c.set_block(x, y, z, dirt_block)
@@ -205,12 +199,19 @@ class TerrainGenerator(TerrainGeneratorBase):
             else:
                 c.set_block(x, y, z, dirt_block)
         elif biome_type == G.DESERT:
-            if depth > 8: 
+            if depth > 8:
                 c.set_block(x, y, z, stone_block)
             else:
                 c.set_block(x, y, z, sand_block)
 
         return c
+
+    def gen_inner_layer(self, x, y, z, c):
+        # Mineral generation should be here also
+        c.set_block(x, y, z, stone_block)
+        return c
+
+
 
     def lerp(self, x, x1, x2, v00, v01):
         return (float(x2 - x) / float(x2 - x1)) * v00 + (float(x - x1) / float(x2 - x1)) * v01

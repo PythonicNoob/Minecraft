@@ -65,7 +65,6 @@ def sample():
 def grass_verts(pos,n=0.5):
     x,y,z = pos; v = tuple((x+X,y+Y,z+Z) for X in (-n,n) for Y in (-n,n) for Z in (-n,n))
     return tuple(tuple(k for j in i for k in v[j]) for i in ((0,5,7,2),(1,4,6,3)))
-
 def cube_vertices_with_sides(x, y, z, n=0.5):
     """ Return the vertices of the cube at position x, y, z with size 2*n.
     """
@@ -81,7 +80,7 @@ def cube_vertices_with_sides(x, y, z, n=0.5):
         [v2x, v2y, v2z, v2x, v2y, v1z, v2x, v1y, v1z, v2x, v1y, v2z],  # left
         [v1x, v2y, v1z, v1x, v2y, v2z, v1x, v1y, v2z, v1x, v1y, v1z],  # right
         [v2x, v2y, v1z, v1x, v2y, v1z, v1x, v1y, v1z, v2x, v1y, v1z],  # front
-        [x+n, y-n, z-n, x-n, y-n, z-n, x-n, y+n, z-n, x+n, y+n, z-n],  # back
+        [v1x, v2y, v2z, v2x, v2y, v2z, v2x, v1y, v2z, v1x, v1y, v2z],  # back
     ]
 
 def cactus_cube_vertices_with_sides(x, y, z, n=0.5, value_reduction=(2,16), extra = 0):
@@ -498,6 +497,7 @@ deadbush_block = Plant(*PLANTS['deadbush_block'])
 cactus_block = Cactus(*PLANTS['cactus_block'], transparent=True)
 tallcactus_block = cactus_block
 reed_block = sugarcane_block = Plant(*PLANTS['sugarcane_block'])
+chest=Block(46,['textures/entity/chest/normal.png']*6)
 
 oakwood_block = Block(*BLOCKS['oakwood_block'])
 oakleaf_block = Block(*BLOCKS['oakleaf_block'],  transparent=True, colors=[(0, 124/255, 0, 1)]*6)
@@ -570,6 +570,8 @@ magenta_concrete = Block(*BLOCKS['magenta_concrete'])
 magenta_wool = Block(*BLOCKS['magenta_wool'])
 lime_wool = Block(*BLOCKS['lime_wool'])
 lime_concrete = Block(*BLOCKS['lime_concrete'])#60
+
+
 
 
 

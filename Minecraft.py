@@ -1222,7 +1222,7 @@ class Window(pyglet.window.Window):
         self.draw_focused_block()
         self.set_2d()
         self.draw_label()
-        self.cpu_usage()
+        self.draw_cpu_usage()
         self.draw_reticle()
         # Experimental
 
@@ -1242,15 +1242,39 @@ class Window(pyglet.window.Window):
             pyglet.graphics.draw(24, GL_QUADS, ('v3f/static', vertex_data))
             glPolygonMode(GL_FRONT_AND_BACK, GL_FILL)
 
-    def optimize():
-        pid = os.getpid()
-        p = psutil.Process(pid)
-        p.nice(psutil.HIGH_PRIORITY_CLASS)
-        p.ionice(psutil.IOPRIO_HIGH)
-    def cpu_usage(self):
+
+    def draw_cpu_usage(self):
+
         c = psutil.cpu_percent(interval=0)
-        d = "CPU: "+str(c)+"%"
-        label=pyglet.text.Label(d,font_name="Arial", font_size=16,color=(0,0,0,255))
+        p=psutil.virtual_memory().percent
+        d = "CPU: "+str(c)+"% "
+        e = "RAM: "+str(p)+"%"
+        f=psutil.sensors_battery().percent
+        g = "BATT: "+str(f)+"%"
+
+        # rather than making a label every time just define color
+
+        color = (0,0,0,255) #default color
+
+        #its messed up here  lol i dont need to do this much for me it does on its own
+
+        if c<90:
+            color = (0, 0, 0, 255)
+        else:
+            color = (255, 0, 0, 255)
+
+        label = pyglet.text.Label(d, font_name="Arial", font_size=16, color=color)
+        label.draw()
+        #
+        if p<90:
+            label=pyglet.text.Label(e,font_name="Arial", font_size=16,color=(0,0,0,255),x=0,y=20)
+        else:
+            label = pyglet.text.Label(e, font_name="Arial", font_size=16, color=(255, 0, 0, 255), x=0, y=20)
+        label.draw()
+        if f<20:
+            label = pyglet.text.Label(g, font_name="Arial", font_size=16, color=(255, 0, 0, 255), x=0, y=40)
+        else:
+            label = pyglet.text.Label(g, font_name="Arial", font_size=16, color=(0, 0, 0, 255), x=0, y=40)
         label.draw()
 
     def draw_label(self):
@@ -1318,11 +1342,17 @@ def setup():
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST)
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST)
     setup_fog()
+def optimize():
+    pid = os.getpid()
+    p = psutil.Process(pid)
+    p.nice(psutil.HIGH_PRIORITY_CLASS)
+    p.ionice(psutil.IOPRIO_HIGH)
 
 
 def main():
-    window = Window(width=800, height=600, caption='Pyglet', resizable=True, fullscreen=False)
+    window = Window(width=800, height=600, caption='Pyglet', resizable=True, fullscreen=True)
     # Hide the mouse cursor and prevent the mouse from leaving the window.
+    #optimize()
     window.set_exclusive_mouse(True)
     setup()
     pyglet.app.run()
