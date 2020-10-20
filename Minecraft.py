@@ -1252,11 +1252,7 @@ class Window(pyglet.window.Window):
         f=psutil.sensors_battery().percent
         g = "BATT: "+str(f)+"%"
 
-        # rather than making a label every time just define color
-
         color = (0,0,0,255) #default color
-
-        #its messed up here  lol i dont need to do this much for me it does on its own
 
         if c<90:
             color = (0, 0, 0, 255)
@@ -1267,14 +1263,14 @@ class Window(pyglet.window.Window):
         label.draw()
         #
         if p<90:
-            label=pyglet.text.Label(e,font_name="Arial", font_size=16,color=(0,0,0,255),x=0,y=20)
+            color=(0,0,0,255)
         else:
-            label = pyglet.text.Label(e, font_name="Arial", font_size=16, color=(255, 0, 0, 255), x=0, y=20)
+            color=(255,0,0,255)
+        label = pyglet.text.Label(e, font_name="Arial", font_size=16, color=color, x=0, y=20)
         label.draw()
         if f<20:
-            label = pyglet.text.Label(g, font_name="Arial", font_size=16, color=(255, 0, 0, 255), x=0, y=40)
-        else:
-            label = pyglet.text.Label(g, font_name="Arial", font_size=16, color=(0, 0, 0, 255), x=0, y=40)
+            color=(255,0,0,255)
+        label = pyglet.text.Label(g, font_name="Arial", font_size=16, color=(0, 0, 0, 255), x=0, y=40)
         label.draw()
 
     def draw_label(self):
@@ -1350,7 +1346,7 @@ def optimize():
 
 
 def main():
-    window = Window(width=800, height=600, caption='Pyglet', resizable=True, fullscreen=True)
+    window = Window(width=800, height=600, caption='Pyglet', resizable=True, fullscreen=False)
     # Hide the mouse cursor and prevent the mouse from leaving the window.
     #optimize()
     window.set_exclusive_mouse(True)
