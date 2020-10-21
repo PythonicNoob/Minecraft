@@ -1270,7 +1270,9 @@ class Window(pyglet.window.Window):
         label.draw()
         if f<20:
             color=(255,0,0,255)
-        label = pyglet.text.Label(g, font_name="Arial", font_size=16, color=(0, 0, 0, 255), x=0, y=40)
+        else:
+            color=(0,0,0,255)
+        label = pyglet.text.Label(g, font_name="Arial", font_size=16, color=color, x=0, y=40)
         label.draw()
 
     def draw_label(self):
