@@ -82,6 +82,21 @@ def cube_vertices_with_sides(x, y, z, n=0.5):
         [v2x, v2y, v1z, v1x, v2y, v1z, v1x, v1y, v1z, v2x, v1y, v1z],  # front
         [v1x, v2y, v2z, v2x, v2y, v2z, v2x, v1y, v2z, v1x, v1y, v2z],  # back
     ]
+def chest_cube_vertices_with_sides(x,y,z,n=0.5,lid_space=6):
+    v1x = x + n
+    v2x = x - n
+    v1y = y + n-(n*(lid_space/16))
+    v2y = y - n
+    v1z = z + n
+    v2z = z - n
+    return [
+        [v2x, v1y, v2z, v2x, v1y, v1z, v1x, v1y, v1z, v1x, v1y, v2z],  # top
+        [v2x, v2y, v2z, v1x, v2y, v2z, v1x, v2y, v1z, v2x, v2y, v1z],  # bottom
+        [v2x, v2y, v2z, v2x, v2y, v1z, v2x, v1y, v1z, v2x, v1y, v2z],  # left
+        [v1x, v2y, v1z, v1x, v2y, v2z, v1x, v1y, v2z, v1x, v1y, v1z],  # right
+        [v2x, v2y, v1z, v1x, v2y, v1z, v1x, v1y, v1z, v2x, v1y, v1z],  # front
+        [v1x, v2y, v2z, v2x, v2y, v2z, v2x, v1y, v2z, v1x, v1y, v2z],  # back
+    ]
 
 def cactus_cube_vertices_with_sides(x, y, z, n=0.5, value_reduction=(2,16), extra = 0):
     """ Return the vertices of the cube at position x, y, z with size 2*n.
@@ -340,7 +355,22 @@ class Cactus(Block):
                             ('t2f/static', texture_data))]
 
         return shown
+class chest(Block):
 
+    def show(self, pos, batch):
+        block_tex = self.get_textures()
+        block_cols = self.get_colors()
+        # print("block cols:", block_cols)
+        texture_data = (0, 0, 1, 0, 1, 1, 0, 1)
+        vertex_data = chest_cube_vertices_with_sides(*pos)
+        shown = []
+
+        # vertex_data[0]
+        for sde in range(0, 6):
+            shown += [batch.add(4, GL_QUADS, block_tex[sde], ('v3f/static', vertex_data[sde]),
+                            ('t2f/static', texture_data))]
+
+        return shown
 BLOCKS = {
     'stone_block':( 'pinecraft:stone_block', ['textures/block/stone.png'] * 6),
     'birchleaf_block':('pinecraft:birchleaf_block', ['textures/block/birch_leaves.png']*6),
@@ -497,7 +527,7 @@ deadbush_block = Plant(*PLANTS['deadbush_block'])
 cactus_block = Cactus(*PLANTS['cactus_block'], transparent=True)
 tallcactus_block = cactus_block
 reed_block = sugarcane_block = Plant(*PLANTS['sugarcane_block'])
-chest=Block(46,['textures/entity/chest/Chest inside.jpg']*2+['textures/entity/chest/Chest side.jpg']*4,transparent=True)
+chest=chest(46,['textures/entity/chest/Chest inside.jpg']*2+['textures/entity/chest/Chest side.jpg']*4,transparent=True)
 
 oakwood_block = Block(*BLOCKS['oakwood_block'])
 oakleaf_block = Block(*BLOCKS['oakleaf_block'],  transparent=True, colors=[(0, 124/255, 0, 1)]*6)
