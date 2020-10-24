@@ -7,7 +7,7 @@ import pyglet
 # import numpy as np
 
 __all__ = (
-    'stone_block', 'sand_block', 'brick_block', 'bedrock_block', 'acacia_leaves_block', 'acacia_sapling_block','blue_concrete_powder_block', 'grass_block', 'water_block', 'dirt_block', 'snow_block', 'diamondore_block', 'coalore_block', 'gravel_block','ironore_block','lapisore_block', 'quartz_block','clay_block','nether_block','nether_quartz_ore_block' ,'soulsand_block', 'sandstone_block', 'ice_block', 'snowgrass_block', 'air_block', 'melon_block','pumpkin_block', 'yflowers_block', 'potato_block', 'carrot_block', 'rose_block', 'fern_block', 'wildgrass0_block','wildgrass1_block', 'wildgrass0_block', 'wildgrass2_block', 'wildgrass3_block', 'wildgrass4_block', 'wildgrass5_block','wildgrass6_block','wildgrass7_block', 'deadbush_block', 'cactus_block', 'tallcactus_block','reed_block','oakwood_block','oakleaf_block','junglewood_block','jungleleaf_block','birchwood_block','birchleaf_block', 'potato_stage0_block', 'bell', 'beacon', 'ancient_debris', 'blackstone', 'cartography_table', 'crying_obsidian', 'cyan_stained_glass', 'cobweb', 'observer_block')
+    'stone_block', 'sand_block', 'brick_block', 'bedrock_block', 'acacia_leaves_block', 'acacia_sapling_block','blue_concrete_powder_block', 'grass_block', 'water_block', 'dirt_block', 'snow_block', 'diamondore_block', 'coalore_block', 'gravel_block','ironore_block','lapisore_block', 'quartz_block','clay_block','nether_block','nether_quartz_ore_block' ,'soulsand_block', 'sandstone_block', 'ice_block', 'snowgrass_block', 'air_block', 'melon_block','pumpkin_block', 'yflowers_block', 'potato_block', 'carrot_block', 'rose_block', 'fern_block', 'wildgrass0_block','wildgrass1_block', 'wildgrass0_block', 'wildgrass2_block', 'wildgrass3_block', 'wildgrass4_block', 'wildgrass5_block','wildgrass6_block','wildgrass7_block', 'deadbush_block', 'cactus_block', 'tallcactus_block','reed_block','oakwood_block','oakleaf_block','junglewood_block','jungleleaf_block','birchwood_block','birchleaf_block', 'potato_stage0_block', 'bell', 'beacon', 'ancient_debris', 'blackstone', 'cartography_table', 'crying_obsidian', 'cyan_stained_glass', 'cobweb', 'observer_block','chest')
 
 def grass_on_place(pos, model):
     x, y, z = pos
@@ -497,7 +497,7 @@ deadbush_block = Plant(*PLANTS['deadbush_block'])
 cactus_block = Cactus(*PLANTS['cactus_block'], transparent=True)
 tallcactus_block = cactus_block
 reed_block = sugarcane_block = Plant(*PLANTS['sugarcane_block'])
-chest=Block(46,['textures/entity/chest/normal.png']*6)
+chest=Block(46,['textures/entity/chest/Chest inside.jpg']*2+['textures/entity/chest/Chest side.jpg']*4,transparent=True)
 
 oakwood_block = Block(*BLOCKS['oakwood_block'])
 oakleaf_block = Block(*BLOCKS['oakleaf_block'],  transparent=True, colors=[(0, 124/255, 0, 1)]*6)

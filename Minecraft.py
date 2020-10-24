@@ -788,7 +788,7 @@ class Window(pyglet.window.Window):
 
         # A list of blocks the player can place. Hit num keys to cycle.
         # self.inventory = [BRICK, GRASS, SAND]
-        self.inventory = [brick_block, grass_block, sand_block, stone_block, acacia_leaves_block, acacia_sapling_block, blue_concrete_powder_block, water_block, yflowers_block]
+        self.inventory = [chest, grass_block, sand_block, stone_block, acacia_leaves_block, acacia_sapling_block, blue_concrete_powder_block, water_block, yflowers_block]
 
         self.hotbar = Hotbar(self.inventory)
 
@@ -980,36 +980,39 @@ class Window(pyglet.window.Window):
         return tuple(p)
 
     def right_click(self, previous, click_pos):
-        right_click_action = self.model.shown[click_pos].right_click_press()
-        if right_click_action is not None:
-            # Peform right click action, open chests, inventory, place water etc.
-            #print("Performing action: ", right_click_action)
+        try:
+            right_click_action = self.model.shown[click_pos].right_click_press()
+            if right_click_action is not None:
+                # Peform right click action, open chests, inventory, place water etc.
+                #print("Performing action: ", right_click_action)
+                pass
+            else:
+                # grass should turn to dirt.
+                # Other conditions also can be added by checkking with blocks
+                # Like for plants can be checked if growable nearby
+                # Grass, Flowers etc. should be removed
+                # Water should also bre removed
+
+                x, y, z = previous
+                y -= 1
+
+                # if '*' in self.model.placeable_on
+
+                this_block = self.hotbar.current_block
+
+                if self.model.world.get((x, y, z), None):
+
+                    if self.model.world[x, y, z] not in this_block.placeable_on and '*' not in this_block.placeable_on:
+                        return
+
+                    if self.model.world[x,y,z] == grass_block and isinstance(this_block, Plant) == False:
+                        self.model.remove_block((x, y, z), immediate=True)
+                        self.model.add_block_new((x, y, z), dirt_block, immediate=True)
+
+                self.model.add_block_new(previous, this_block)
+                this_block.on_place(previous, self.model)
+        except:
             pass
-        else:
-            # grass should turn to dirt.
-            # Other conditions also can be added by checkking with blocks
-            # Like for plants can be checked if growable nearby
-            # Grass, Flowers etc. should be removed
-            # Water should also bre removed
-
-            x, y, z = previous
-            y -= 1
-
-            # if '*' in self.model.placeable_on
-
-            this_block = self.hotbar.current_block
-
-            if self.model.world.get((x, y, z), None):
-
-                if self.model.world[x, y, z] not in this_block.placeable_on and '*' not in this_block.placeable_on:
-                    return
-
-                if self.model.world[x,y,z] == grass_block and isinstance(this_block, Plant) == False:
-                    self.model.remove_block((x, y, z), immediate=True)
-                    self.model.add_block_new((x, y, z), dirt_block, immediate=True)
-
-            self.model.add_block_new(previous, this_block)
-            this_block.on_place(previous, self.model)
 
     def on_mouse_press(self, x, y, button, modifiers):
         """ Called when a mouse button is pressed. See pyglet docs for button
@@ -1218,7 +1221,7 @@ class Window(pyglet.window.Window):
         # glDisable(GL_CULL_FACE)
         # self.model.plants_batch.draw()
         # glEnable(GL_CULL_FACE)
-
+        self.draw_shift()
         self.draw_focused_block()
         self.set_2d()
         self.draw_label()
@@ -1274,16 +1277,14 @@ class Window(pyglet.window.Window):
             color=(0,0,0,255)
         label = pyglet.text.Label(g, font_name="Arial", font_size=16, color=color, x=0, y=40)
         label.draw()
-        end=time.time()
-        t=end-start
-        t1=str(int(t))
-        label=pyglet.text.Label(t1,font_name="Arial",font_size=16, color=color,x=0,y=60)
-        label.draw()
+
+    def draw_shift(self):
+        end = time.time()
+        t = end - start
         if t % 60 < 30:
             glClearColor(0.1, 0.2, 0.35, 0.1)
         else:
             glClearColor(0.5, 0.69, 1.0, 1)
-
 
     def draw_label(self):
         """ Draw the label in the top left of the screen.
