@@ -37,7 +37,7 @@ SECTOR_SIZE = 16
 
 WALKING_SPEED = 5
 FLYING_SPEED = 15
-
+start=time.time()
 GRAVITY = 20.0
 MAX_JUMP_HEIGHT = 1.0 # About the height of a block.pip install pyglet
 # To derive the formula for calculating jump speed, first solve
@@ -1274,6 +1274,16 @@ class Window(pyglet.window.Window):
             color=(0,0,0,255)
         label = pyglet.text.Label(g, font_name="Arial", font_size=16, color=color, x=0, y=40)
         label.draw()
+        end=time.time()
+        t=end-start
+        t1=str(int(t))
+        label=pyglet.text.Label(t1,font_name="Arial",font_size=16, color=color,x=0,y=60)
+        label.draw()
+        if t % 60 < 30:
+            glClearColor(0.1, 0.2, 0.35, 0.1)
+        else:
+            glClearColor(0.5, 0.69, 1.0, 1)
+
 
     def draw_label(self):
         """ Draw the label in the top left of the screen.
