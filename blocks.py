@@ -82,7 +82,7 @@ def cube_vertices_with_sides(x, y, z, n=0.5):
         [v2x, v2y, v1z, v1x, v2y, v1z, v1x, v1y, v1z, v2x, v1y, v1z],  # front
         [v1x, v2y, v2z, v2x, v2y, v2z, v2x, v1y, v2z, v1x, v1y, v2z],  # back
     ]
-def chest_cube_vertices_with_sides(x,y,z,n=0.5,lid_space=6):
+def chest_cube_vertices_with_sides(x,y,z,n=0.5,lid_space=12):
     v1x = x + n
     v2x = x - n
     v1y = y + n-(n*(lid_space/16))
@@ -527,7 +527,7 @@ deadbush_block = Plant(*PLANTS['deadbush_block'])
 cactus_block = Cactus(*PLANTS['cactus_block'], transparent=True)
 tallcactus_block = cactus_block
 reed_block = sugarcane_block = Plant(*PLANTS['sugarcane_block'])
-chest=chest(46,['textures/entity/chest/Chest inside.jpg']*2+['textures/entity/chest/Chest side.jpg']*4,transparent=True)
+chest=chest(46,['textures/entity/chest/Chest inside.jpg']+['textures/entity/chest/Chest bottom.jpg']+['textures/entity/chest/Chest side.jpg']*4,transparent=True)
 
 oakwood_block = Block(*BLOCKS['oakwood_block'])
 oakleaf_block = Block(*BLOCKS['oakleaf_block'],  transparent=True, colors=[(0, 124/255, 0, 1)]*6)
