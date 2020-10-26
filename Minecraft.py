@@ -788,7 +788,7 @@ class Window(pyglet.window.Window):
 
         # A list of blocks the player can place. Hit num keys to cycle.
         # self.inventory = [BRICK, GRASS, SAND]
-        self.inventory = [chest, grass_block, sand_block, stone_block, acacia_leaves_block, acacia_sapling_block, blue_concrete_powder_block, water_block, yflowers_block]
+        self.inventory = [chest, grass_block, lid, stone_block, acacia_leaves_block, acacia_sapling_block, blue_concrete_powder_block, water_block, yflowers_block]
 
         self.hotbar = Hotbar(self.inventory)
 

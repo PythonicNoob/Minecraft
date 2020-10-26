@@ -7,7 +7,7 @@ import pyglet
 # import numpy as np
 
 __all__ = (
-    'stone_block', 'sand_block', 'brick_block', 'bedrock_block', 'acacia_leaves_block', 'acacia_sapling_block','blue_concrete_powder_block', 'grass_block', 'water_block', 'dirt_block', 'snow_block', 'diamondore_block', 'coalore_block', 'gravel_block','ironore_block','lapisore_block', 'quartz_block','clay_block','nether_block','nether_quartz_ore_block' ,'soulsand_block', 'sandstone_block', 'ice_block', 'snowgrass_block', 'air_block', 'melon_block','pumpkin_block', 'yflowers_block', 'potato_block', 'carrot_block', 'rose_block', 'fern_block', 'wildgrass0_block','wildgrass1_block', 'wildgrass0_block', 'wildgrass2_block', 'wildgrass3_block', 'wildgrass4_block', 'wildgrass5_block','wildgrass6_block','wildgrass7_block', 'deadbush_block', 'cactus_block', 'tallcactus_block','reed_block','oakwood_block','oakleaf_block','junglewood_block','jungleleaf_block','birchwood_block','birchleaf_block', 'potato_stage0_block', 'bell', 'beacon', 'ancient_debris', 'blackstone', 'cartography_table', 'crying_obsidian', 'cyan_stained_glass', 'cobweb', 'observer_block','chest')
+    'stone_block', 'sand_block', 'brick_block', 'bedrock_block', 'acacia_leaves_block', 'acacia_sapling_block','blue_concrete_powder_block', 'grass_block', 'water_block', 'dirt_block', 'snow_block', 'diamondore_block', 'coalore_block', 'gravel_block','ironore_block','lapisore_block', 'quartz_block','clay_block','nether_block','nether_quartz_ore_block' ,'soulsand_block', 'sandstone_block', 'ice_block', 'snowgrass_block', 'air_block', 'melon_block','pumpkin_block', 'yflowers_block', 'potato_block', 'carrot_block', 'rose_block', 'fern_block', 'wildgrass0_block','wildgrass1_block', 'wildgrass0_block', 'wildgrass2_block', 'wildgrass3_block', 'wildgrass4_block', 'wildgrass5_block','wildgrass6_block','wildgrass7_block', 'deadbush_block', 'cactus_block', 'tallcactus_block','reed_block','oakwood_block','oakleaf_block','junglewood_block','jungleleaf_block','birchwood_block','birchleaf_block', 'potato_stage0_block', 'bell', 'beacon', 'ancient_debris', 'blackstone', 'cartography_table', 'crying_obsidian', 'cyan_stained_glass', 'cobweb', 'observer_block','chest','lid')
 
 def grass_on_place(pos, model):
     x, y, z = pos
@@ -85,8 +85,23 @@ def cube_vertices_with_sides(x, y, z, n=0.5):
 def chest_cube_vertices_with_sides(x,y,z,n=0.5,lid_space=12):
     v1x = x + n
     v2x = x - n
-    v1y = y + n-(n*(lid_space/16))
+    v1y = y + n - (n * (lid_space / 16))
     v2y = y - n
+    v1z = z + n
+    v2z = z - n
+    return [
+        [v2x, v1y, v2z, v2x, v1y, v1z, v1x, v1y, v1z, v1x, v1y, v2z],  # top
+        [v2x, v2y, v2z, v1x, v2y, v2z, v1x, v2y, v1z, v2x, v2y, v1z],  # bottom
+        [v2x, v2y, v2z, v2x, v2y, v1z, v2x, v1y, v1z, v2x, v1y, v2z],  # left
+        [v1x, v2y, v1z, v1x, v2y, v2z, v1x, v1y, v2z, v1x, v1y, v1z],  # right
+        [v2x, v2y, v1z, v1x, v2y, v1z, v1x, v1y, v1z, v2x, v1y, v1z],  # front
+        [v1x, v2y, v2z, v2x, v2y, v2z, v2x, v1y, v2z, v1x, v1y, v2z],  # back
+    ]
+def lid_cube_vertices_with_sides(x,y,z,n=0.5,lid_space=12):
+    v1x = x + n
+    v2x = x - n
+    v1y = y + n - (n * (1 / 16))
+    v2y = y + (n*lid_space-8/16)
     v1z = z + n
     v2z = z - n
     return [
@@ -371,6 +386,21 @@ class chest(Block):
                             ('t2f/static', texture_data))]
 
         return shown
+class lid_chest(Block):
+    def show(self, pos, batch):
+        block_tex = self.get_textures()
+        block_cols = self.get_colors()
+        # print("block cols:", block_cols)
+        texture_data = (0, 0, 1, 0, 1, 1, 0, 1)
+        vertex_data = lid_cube_vertices_with_sides(*pos)
+        shown = []
+
+        # vertex_data[0]
+        for sde in range(0, 6):
+            shown += [batch.add(4, GL_QUADS, block_tex[sde], ('v3f/static', vertex_data[sde]),
+                            ('t2f/static', texture_data))]
+
+        return shown
 BLOCKS = {
     'stone_block':( 'pinecraft:stone_block', ['textures/block/stone.png'] * 6),
     'birchleaf_block':('pinecraft:birchleaf_block', ['textures/block/birch_leaves.png']*6),
@@ -528,7 +558,7 @@ cactus_block = Cactus(*PLANTS['cactus_block'], transparent=True)
 tallcactus_block = cactus_block
 reed_block = sugarcane_block = Plant(*PLANTS['sugarcane_block'])
 chest=chest(46,['textures/entity/chest/Chest inside.jpg']+['textures/entity/chest/Chest bottom.jpg']+['textures/entity/chest/Chest side.jpg']*4,transparent=True)
-
+lid=lid_chest(47,['textures/entity/chest/Chest lid top.jpg']+['textures/entity/chest/Chest lid bottom.jpg']+['textures/entity/chest/Chest lid side.jpg']*4,transparent=True)
 oakwood_block = Block(*BLOCKS['oakwood_block'])
 oakleaf_block = Block(*BLOCKS['oakleaf_block'],  transparent=True, colors=[(0, 124/255, 0, 1)]*6)
 
