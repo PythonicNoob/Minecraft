@@ -11,6 +11,7 @@ import threading
 import pickle
 import multiprocessing
 import concurrent.futures
+import pyautogui
 
 from collections import deque
 from concurrent.futures.thread import ThreadPoolExecutor
@@ -33,7 +34,9 @@ from hotbar import Hotbar
 # import threading
 
 TICKS_PER_SEC = 60
-
+anim=pyglet.image.load_animation('loading screen.gif')
+wi,he=pyautogui.size()
+loading=pyglet.sprite.Sprite(anim)
 # Size of sectors used to ease block loading.
 SECTOR_SIZE = 16
 
@@ -1214,7 +1217,6 @@ class Window(pyglet.window.Window):
         glEnable(GL_ALPHA_TEST)
         self.model.batch.draw()
         glDisable (GL_ALPHA_TEST)
-
         glColorMask(GL_FALSE, GL_FALSE, GL_FALSE, GL_FALSE);
         self.model.transparent_batch.draw()
         glColorMask(GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE);
@@ -1229,6 +1231,8 @@ class Window(pyglet.window.Window):
         #self.draw_label()
         #self.draw_cpu_usage()
         self.draw_reticle()
+        t = threading.Thread(target=self.loading())
+        t.start()
         # Experimental
         t = threading.Thread(target=self.draw_shift())
         t.start()
@@ -1237,6 +1241,9 @@ class Window(pyglet.window.Window):
         t = threading.Thread(target=self.draw_label())
         t.start()
         self.hotbar.draw()
+    def loading(self):
+        if len(self.model._shown)<9000:
+            loading.draw()
 
     def draw_focused_block(self):
         """ Draw black edges around the block that is currently under the
@@ -1354,14 +1361,14 @@ def optimize():
     try:
         pid = os.getpid()
         p = psutil.Process(pid)
-        p.set_nice(psutil.HIGH_PRIORITY_CLASS)
-        p.ionice(psutil.IOPRIO_HIGH)
+        print(p)
     except:
-        pass
+        print("Optimisation did not work")
 
 
 def main():
-    window = Window(width=800, height=600, caption='Pyglet', resizable=True, fullscreen=False)
+    width,height=pyautogui.size()
+    window = Window(width, height, caption='Pyglet', resizable=True, fullscreen=True)
     # Hide the mouse cursor and prevent the mouse from leaving the window.
     optimize()
     window.set_exclusive_mouse(True)
