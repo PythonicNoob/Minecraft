@@ -10,6 +10,7 @@ import psutil
 import threading
 import pickle
 import multiprocessing
+import concurrent.futures
 
 from collections import deque
 from concurrent.futures.thread import ThreadPoolExecutor
@@ -1253,7 +1254,7 @@ class Window(pyglet.window.Window):
 
 
     def draw_cpu_usage(self):
-        c = psutil.cpu_percent(interval=1)
+        c = psutil.cpu_percent(interval=0)
         p=psutil.virtual_memory().percent
         d = "CPU: "+str(c)+"% "
         e = "RAM: "+str(p)+"%"
