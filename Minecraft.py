@@ -1313,12 +1313,6 @@ class Window(pyglet.window.Window):
 
         glColor3d(1,1,1)
         self.hotbar.draw()
-def optimize():
-    pid=os.getpid()
-    p = psutil.Process(pid)
-    p.nice(psutil.HonO_HIGH)
-
-
 def setup_fog():
     """ Configure the OpenGL fog properties.
     """
@@ -1360,7 +1354,7 @@ def optimize():
     try:
         pid = os.getpid()
         p = psutil.Process(pid)
-        p.nice(psutil.HIGH_PRIORITY_CLASS)
+        p.set_nice(psutil.HIGH_PRIORITY_CLASS)
         p.ionice(psutil.IOPRIO_HIGH)
     except:
         pass

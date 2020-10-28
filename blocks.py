@@ -101,7 +101,7 @@ def lid_cube_vertices_with_sides(x,y,z,n=0.5,lid_space=12):
     v1x = x + n
     v2x = x - n
     v1y = y + n - (n * (1 / 16))
-    v2y = y + (n*lid_space-8/16)
+    v2y = y + (n*(lid_space-8)/16)
     v1z = z + n
     v2z = z - n
     return [
