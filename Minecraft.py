@@ -9,6 +9,7 @@ import os
 import psutil
 import threading
 import pickle
+import multiprocessing
 
 from collections import deque
 from concurrent.futures.thread import ThreadPoolExecutor
@@ -1221,14 +1222,19 @@ class Window(pyglet.window.Window):
         # glDisable(GL_CULL_FACE)
         # self.model.plants_batch.draw()
         # glEnable(GL_CULL_FACE)
-        self.draw_shift()
+        #self.draw_shift()
         self.draw_focused_block()
         self.set_2d()
-        self.draw_label()
-        self.draw_cpu_usage()
+        #self.draw_label()
+        #self.draw_cpu_usage()
         self.draw_reticle()
         # Experimental
-
+        t = threading.Thread(target=self.draw_shift())
+        t.start()
+        t = threading.Thread(target=self.draw_cpu_usage())
+        t.start()
+        t = threading.Thread(target=self.draw_label())
+        t.start()
         self.hotbar.draw()
 
     def draw_focused_block(self):
@@ -1247,8 +1253,7 @@ class Window(pyglet.window.Window):
 
 
     def draw_cpu_usage(self):
-
-        c = psutil.cpu_percent(interval=0)
+        c = psutil.cpu_percent(interval=1)
         p=psutil.virtual_memory().percent
         d = "CPU: "+str(c)+"% "
         e = "RAM: "+str(p)+"%"
@@ -1310,8 +1315,7 @@ class Window(pyglet.window.Window):
 def optimize():
     pid=os.getpid()
     p = psutil.Process(pid)
-    p.nice(psutil.HIGH_PRIORITY_CLASS)
-    p.ionice(psutil.IOPRIO_HIGH)
+    p.nice(psutil.HonO_HIGH)
 
 
 def setup_fog():
@@ -1352,16 +1356,19 @@ def setup():
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST)
     setup_fog()
 def optimize():
-    pid = os.getpid()
-    p = psutil.Process(pid)
-    p.nice(psutil.HIGH_PRIORITY_CLASS)
-    p.ionice(psutil.IOPRIO_HIGH)
+    try:
+        pid = os.getpid()
+        p = psutil.Process(pid)
+        p.nice(psutil.HIGH_PRIORITY_CLASS)
+        p.ionice(psutil.IOPRIO_HIGH)
+    except:
+        pass
 
 
 def main():
     window = Window(width=800, height=600, caption='Pyglet', resizable=True, fullscreen=False)
     # Hide the mouse cursor and prevent the mouse from leaving the window.
-    #optimize()
+    optimize()
     window.set_exclusive_mouse(True)
     setup()
     pyglet.app.run()
