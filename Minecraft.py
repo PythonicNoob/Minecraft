@@ -54,7 +54,7 @@ MAX_JUMP_HEIGHT = 1.0 # About the height of a block.pip install pyglet
 #    s = s_0 + v_0 * t + (a * t^2) / 2
 JUMP_SPEED = math.sqrt(2 * GRAVITY * MAX_JUMP_HEIGHT)
 TERMINAL_VELOCITY = 50
-
+kl=1
 PLAYER_HEIGHT = 2
 
 def sector_to_blockpos(secpos):
@@ -1081,20 +1081,20 @@ class Window(pyglet.window.Window):
         """
         if symbol == key.W:
             self.strafe[0] -= 1
-        elif symbol == key.S:
+        if symbol == key.S:
             self.strafe[0] += 1
-        elif symbol == key.A:
+        if symbol == key.A:
             self.strafe[1] -= 1
-        elif symbol == key.D:
+        if symbol == key.D:
             self.strafe[1] += 1
-        elif symbol == key.SPACE:
+        if symbol == key.SPACE:
             if self.dy == 0:
                 self.dy = JUMP_SPEED
-        elif symbol == key.ESCAPE:
+        if symbol == key.ESCAPE:
             self.set_exclusive_mouse(False)
-        elif symbol == key.TAB:
+        if symbol == key.TAB:
             self.flying = not self.flying
-        elif symbol in self.num_keys:
+        if symbol in self.num_keys:
             index = (symbol - self.num_keys[0]) % self.hotbar.hotbar_size
             self.hotbar.index = index
             # self.block = self.hotbar.current_block #self.inventory[index]
@@ -1231,15 +1231,13 @@ class Window(pyglet.window.Window):
         #self.draw_label()
         #self.draw_cpu_usage()
         self.draw_reticle()
-        t = threading.Thread(target=self.loading())
-        t.start()
         # Experimental
         t = threading.Thread(target=self.draw_shift())
         t.start()
-        t = threading.Thread(target=self.draw_cpu_usage())
-        t.start()
+        self.draw_cpu_usage()
         t = threading.Thread(target=self.draw_label())
         t.start()
+        self.loading()
         self.hotbar.draw()
     def loading(self):
         if len(self.model._shown)<9000:
