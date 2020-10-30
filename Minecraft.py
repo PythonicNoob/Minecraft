@@ -54,7 +54,6 @@ MAX_JUMP_HEIGHT = 1.0 # About the height of a block.pip install pyglet
 #    s = s_0 + v_0 * t + (a * t^2) / 2
 JUMP_SPEED = math.sqrt(2 * GRAVITY * MAX_JUMP_HEIGHT)
 TERMINAL_VELOCITY = 50
-kl=1
 PLAYER_HEIGHT = 2
 
 def sector_to_blockpos(secpos):
@@ -747,7 +746,7 @@ class Window(pyglet.window.Window):
 
         # Whether or not the window exclusively captures the mouse.
         self.exclusive = False
-
+        self.v1=-1
         # When flying gravity has no effect and speed is increased.
         self.flying = True
 
@@ -1079,20 +1078,22 @@ class Window(pyglet.window.Window):
         modifiers : int
             Number representing any modifying keys that were pressed.
         """
-        if symbol == key.W:
+        if symbol == key.Q:
+            self.v1=self.v1*-1
+        if symbol == key.W and len(self.model._shown)>=9000:
             self.strafe[0] -= 1
-        if symbol == key.S:
+        if symbol == key.S and len(self.model._shown)>=9000:
             self.strafe[0] += 1
-        if symbol == key.A:
+        if symbol == key.A and len(self.model._shown)>=9000:
             self.strafe[1] -= 1
-        if symbol == key.D:
+        if symbol == key.D and len(self.model._shown)>=9000:
             self.strafe[1] += 1
-        if symbol == key.SPACE:
+        if symbol == key.SPACE and len(self.model._shown)>=9000:
             if self.dy == 0:
                 self.dy = JUMP_SPEED
         if symbol == key.ESCAPE:
             self.set_exclusive_mouse(False)
-        if symbol == key.TAB:
+        if symbol == key.TAB and len(self.model._shown)>=9000   :
             self.flying = not self.flying
         if symbol in self.num_keys:
             index = (symbol - self.num_keys[0]) % self.hotbar.hotbar_size
@@ -1234,9 +1235,10 @@ class Window(pyglet.window.Window):
         # Experimental
         t = threading.Thread(target=self.draw_shift())
         t.start()
-        self.draw_cpu_usage()
-        t = threading.Thread(target=self.draw_label())
-        t.start()
+        if self.v1==1:
+            self.draw_cpu_usage()
+            t = threading.Thread(target=self.draw_label())
+            t.start()
         self.loading()
         self.hotbar.draw()
     def loading(self):
@@ -1359,7 +1361,7 @@ def optimize():
     try:
         pid = os.getpid()
         p = psutil.Process(pid)
-        print(p)
+        p.nice(-10)
     except:
         print("Optimisation did not work")
 
