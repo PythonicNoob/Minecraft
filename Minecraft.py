@@ -749,7 +749,7 @@ class Window(pyglet.window.Window):
         self.v1=-1
         # When flying gravity has no effect and speed is increased.
         self.flying = True
-
+        self.fr=-1
         # Strafing is moving lateral to the direction you are facing,
         # e.g. moving to the left or right while continuing to face forward.
         #
@@ -1080,20 +1080,24 @@ class Window(pyglet.window.Window):
         """
         if symbol == key.Q:
             self.v1=self.v1*-1
-        if symbol == key.W and len(self.model._shown)>=9000:
+        if symbol == key.W and len(self.model._shown)>=9000 and self.fr==-1:
             self.strafe[0] -= 1
-        if symbol == key.S and len(self.model._shown)>=9000:
+        if symbol == key.S and len(self.model._shown)>=9000 and self.fr==-1:
             self.strafe[0] += 1
-        if symbol == key.A and len(self.model._shown)>=9000:
+        if symbol == key.A and len(self.model._shown)>=9000 and self.fr==-1:
             self.strafe[1] -= 1
-        if symbol == key.D and len(self.model._shown)>=9000:
+        if symbol == key.D and len(self.model._shown)>=9000 and self.fr==-1:
             self.strafe[1] += 1
-        if symbol == key.SPACE and len(self.model._shown)>=9000:
+        if symbol == key.SPACE and len(self.model._shown)>=9000 and self.fr==-1:
             if self.dy == 0:
                 self.dy = JUMP_SPEED
         if symbol == key.ESCAPE:
-            self.set_exclusive_mouse(False)
-        if symbol == key.TAB and len(self.model._shown)>=9000   :
+            self.fr*=-1
+            if self.fr==1:
+                self.set_exclusive_mouse(False)
+            else:
+                self.set_exclusive_mouse(True)
+        if symbol == key.TAB and len(self.model._shown)>=9000:
             self.flying = not self.flying
         if symbol in self.num_keys:
             index = (symbol - self.num_keys[0]) % self.hotbar.hotbar_size
@@ -1111,13 +1115,13 @@ class Window(pyglet.window.Window):
         modifiers : int
             Number representing any modifying keys that were pressed.
         """
-        if symbol == key.W:
+        if symbol == key.W and len(self.model._shown)>9000 and self.fr==-1:
             self.strafe[0] += 1
-        elif symbol == key.S:
+        if symbol == key.S and len(self.model._shown)>9000 and self.fr==-1:
             self.strafe[0] -= 1
-        elif symbol == key.A:
+        if symbol == key.A and len(self.model._shown)>9000 and self.fr==-1:
             self.strafe[1] += 1
-        elif symbol == key.D:
+        if symbol == key.D and len(self.model._shown)>9000 and self.fr==-1:
             self.strafe[1] -= 1
 
     def on_resize(self, width, height):
@@ -1236,9 +1240,10 @@ class Window(pyglet.window.Window):
         t = threading.Thread(target=self.draw_shift())
         t.start()
         if self.v1==1:
-            self.draw_cpu_usage()
+            t1 = threading.Thread(target=self.draw_cpu_usage())
             t = threading.Thread(target=self.draw_label())
             t.start()
+            t1.start()
         self.loading()
         self.hotbar.draw()
     def loading(self):
@@ -1277,7 +1282,9 @@ class Window(pyglet.window.Window):
 
         label = pyglet.text.Label(d, font_name="Arial", font_size=16, color=color)
         label.draw()
-        #
+        if self.fr==1:
+            label=pyglet.text.Label("Paused",font_name="Arial",font_size=16,color=color,x=0,y=60)
+            label.draw()
         if p<90:
             color=(0,0,0,255)
         else:
