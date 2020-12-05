@@ -4,7 +4,7 @@ Terrain generating algorithm
 
 
 # Imports, sorted alphabetically.
-
+import threading
 # Python packages
 from math import sqrt, floor
 import random
@@ -137,7 +137,8 @@ class TerrainGenerator(TerrainGeneratorBase):
                     #print d_map[x][y][z]
 
         # interpolate the missing values
-        self.tri_lerp_d_map(d_map)
+        t=threading.Thread(target=self.tri_lerp_d_map(),args=d_map)
+        t.start()
 
         for x in range(CHUNK_X_SIZE):
             for z in range(CHUNK_Z_SIZE):
@@ -551,11 +552,11 @@ class TerrainGeneratorSimple(TerrainGeneratorBase):
                         # ores and filler...
                         if yy >= 32:
                             blockset = highlevel_ores
-                        elif yy > 9:
+                        if yy > 9:
                             blockset = midlevel_ores
-                        elif yy > 2:
+                        if yy > 2:
                             blockset = lowlevel_ores
-                        elif yy <= 1:
+                        if yy <= 1:
                             blockset = (bedrock_block, )
 
                         init_block((x, yy, z), choose(blockset))
